@@ -1,0 +1,41 @@
+{
+  "id": "c-voice-guard",
+  "name": "C Voice Guard",
+  "version": "1.0.0",
+  "description": "C tool plugin that clamps audio peaks for a safe listener target.",
+  "author": "YanagiKH",
+  "category": "audio",
+  "entry": "main.c",
+  "permissions": [
+    "voice-volume-read",
+    "voice-volume-normalize"
+  ],
+  "settings": [
+    {
+      "key": "limit",
+      "label": "Limit",
+      "type": "range",
+      "value": 68,
+      "min": 0,
+      "max": 100,
+      "step": 1
+    },
+    {
+      "key": "hardClamp",
+      "label": "Hard clamp",
+      "type": "toggle",
+      "value": true
+    }
+  ],
+  "hostKind": "tool",
+  "language": "c",
+  "runtime": {
+    "command": "bin/c-voice-guard"
+  },
+  "build": {
+    "command": "gcc",
+    "args": ["-std=c11", "-O2", "-Wall", "-Wextra", "-Werror", "main.c", "-o", "bin/c-voice-guard"],
+    "output": "bin/c-voice-guard",
+    "notes": "Compile before running."
+  }
+}
