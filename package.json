@@ -6,10 +6,12 @@
   "main": "dist/main/index.js",
   "scripts": {
     "dev": "electron-vite dev",
+    "start:desktop": "electron-vite dev",
     "build": "electron-vite build",
     "preview": "electron-vite preview",
     "typecheck": "tsc --noEmit",
-    "validate:repo": "node scripts/validate-repository.mjs"
+    "validate:repo": "node scripts/validate-repository.mjs",
+    "validate:browser-extension": "node scripts/validate-browser-extension.mjs"
   },
   "dependencies": {
     "adm-zip": "^0.5.16",
