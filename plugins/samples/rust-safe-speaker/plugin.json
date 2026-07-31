@@ -1,0 +1,43 @@
+{
+  "id": "rust-safe-speaker",
+  "name": "Rust Safe Speaker",
+  "version": "1.0.0",
+  "description": "Rust tool plugin that computes a safer speaker gain target.",
+  "author": "YanagiKH",
+  "category": "audio",
+  "entry": "src/main.rs",
+  "permissions": [
+    "voice-volume-read",
+    "voice-volume-normalize",
+    "settings-persistence"
+  ],
+  "settings": [
+    {
+      "key": "ceiling",
+      "label": "Ceiling",
+      "type": "range",
+      "value": 72,
+      "min": 0,
+      "max": 100,
+      "step": 1
+    },
+    {
+      "key": "protectSharpPeaks",
+      "label": "Protect sharp peaks",
+      "type": "toggle",
+      "value": true
+    }
+  ],
+  "hostKind": "tool",
+  "language": "rust",
+  "runtime": {
+    "command": "cargo",
+    "args": ["run", "--release"]
+  },
+  "build": {
+    "command": "cargo",
+    "args": ["build", "--release"],
+    "output": "target/release/rust-safe-speaker",
+    "notes": "Compiles the sample tool as a standalone binary."
+  }
+}
