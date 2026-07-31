@@ -1,7 +1,9 @@
-import { DEFAULT_SETTINGS, normalizeSettings, clamp } from './settings.js';
+import { DEFAULT_SETTINGS, normalizeSettings } from './settings.js';
 
 const PANEL_ID = 'discord-extensions-companion-panel';
 const STYLE_ID = 'discord-extensions-companion-styles';
+
+let currentSettings = normalizeSettings(DEFAULT_SETTINGS);
 
 function applyPageTweaks(settings) {
   const root = document.documentElement;
@@ -44,6 +46,15 @@ function ensureStyles() {
   document.documentElement.appendChild(style);
 }
 
+function setPanelValues(panel, settings) {
+  panel.querySelector('#de-compact').checked = settings.compactMode;
+  panel.querySelector('#de-font').value = String(settings.fontScale);
+  panel.querySelector('#de-sidebar').value = String(settings.sidebarWidth);
+  panel.querySelector('#de-motion').checked = settings.reduceMotion;
+  panel.querySelector('#de-nitro').checked = settings.hideNitroPills;
+  panel.querySelector('#de-quick').checked = settings.showQuickControls;
+}
+
 function buildPanel(settings) {
   if (document.getElementById(PANEL_ID)) return;
 
@@ -73,10 +84,10 @@ function buildPanel(settings) {
   close.addEventListener('click', () => body.setAttribute('hidden', ''));
 
   const persist = async (patch) => {
-    const current = await chrome.storage.local.get(DEFAULT_SETTINGS);
-    const next = normalizeSettings({ ...current, ...patch });
-    await chrome.storage.local.set(next);
-    applyPageTweaks(next);
+    currentSettings = normalizeSettings({ ...currentSettings, ...patch });
+    await chrome.storage.local.set(currentSettings);
+    setPanelValues(panel, currentSettings);
+    applyPageTweaks(currentSettings);
   };
 
   panel.querySelector('#de-compact').addEventListener('change', (event) => persist({ compactMode: event.target.checked }));
@@ -91,13 +102,14 @@ function buildPanel(settings) {
 
 async function init() {
   ensureStyles();
-  const current = normalizeSettings(await chrome.storage.local.get(DEFAULT_SETTINGS));
-  applyPageTweaks(current);
-  buildPanel(current);
+  currentSettings = normalizeSettings(await chrome.storage.local.get(DEFAULT_SETTINGS));
+  applyPageTweaks(currentSettings);
+  buildPanel(currentSettings);
 
   chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName !== 'local') return;
-    const updated = normalizeSettings({
+    currentSettings = normalizeSettings({
+      ...currentSettings,
       compactMode: changes.compactMode?.newValue,
       fontScale: changes.fontScale?.newValue,
       sidebarWidth: changes.sidebarWidth?.newValue,
@@ -105,7 +117,11 @@ async function init() {
       hideNitroPills: changes.hideNitroPills?.newValue,
       showQuickControls: changes.showQuickControls?.newValue
     });
-    applyPageTweaks(updated);
+    const panel = document.getElementById(PANEL_ID);
+    if (panel) {
+      setPanelValues(panel, currentSettings);
+    }
+    applyPageTweaks(currentSettings);
   });
 }
 
