@@ -5,10 +5,14 @@ import path from 'node:path';
 import { builtInPlugins } from '../shared/plugin-registry';
 import type {
   InstalledPlugin,
+  PluginBuildSpec,
+  PluginHostKind,
   PluginImportResult,
+  PluginLanguage,
   PluginManifest,
+  PluginRuntimeSpec,
   PluginSettingField,
-  PluginState,
+  PluginSource,
   PluginStoreRecord
 } from '../shared/types';
 import { ensureWorkspace, getPluginsRoot, openWorkspaceFolder, readPluginStore, writePluginStore } from './persistence';
@@ -24,13 +28,62 @@ function clonePlugin(plugin: InstalledPlugin): InstalledPlugin {
   return {
     ...plugin,
     permissions: [...plugin.permissions],
-    settings: plugin.settings.map(cloneSetting)
+    settings: plugin.settings.map(cloneSetting),
+    runtime: plugin.runtime ? cloneRuntime(plugin.runtime) : undefined,
+    build: plugin.build ? cloneBuild(plugin.build) : undefined
+  };
+}
+
+function cloneRuntime(runtime: PluginRuntimeSpec): PluginRuntimeSpec {
+  return {
+    ...runtime,
+    args: runtime.args ? [...runtime.args] : undefined
+  };
+}
+
+function cloneBuild(build: PluginBuildSpec): PluginBuildSpec {
+  return {
+    ...build,
+    args: build.args ? [...build.args] : undefined
   };
 }
 
 function sanitizeFolderName(value: string): string {
   const cleaned = value.toLowerCase().replace(/[^a-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '');
   return cleaned.length > 0 ? cleaned : 'plugin';
+}
+
+function normalizeHostKind(value: unknown): PluginHostKind {
+  return value === 'tool' ? 'tool' : 'panel';
+}
+
+function normalizeLanguage(value: unknown): PluginLanguage {
+  const allowed: PluginLanguage[] = ['typescript', 'javascript', 'python', 'go', 'rust', 'c', 'cpp'];
+  return allowed.includes(value as PluginLanguage) ? (value as PluginLanguage) : 'typescript';
+}
+
+function normalizeRuntime(value: unknown): PluginRuntimeSpec | undefined {
+  if (typeof value !== 'object' || value === null) return undefined;
+  const runtime = value as Record<string, unknown>;
+  if (typeof runtime.command !== 'string' || runtime.command.trim().length === 0) return undefined;
+  return {
+    command: runtime.command.trim(),
+    args: Array.isArray(runtime.args) ? runtime.args.filter((arg): arg is string => typeof arg === 'string') : undefined,
+    cwd: typeof runtime.cwd === 'string' && runtime.cwd.trim().length > 0 ? runtime.cwd.trim() : undefined,
+    shell: typeof runtime.shell === 'boolean' ? runtime.shell : undefined
+  };
+}
+
+function normalizeBuild(value: unknown): PluginBuildSpec | undefined {
+  if (typeof value !== 'object' || value === null) return undefined;
+  const build = value as Record<string, unknown>;
+  if (typeof build.command !== 'string' || build.command.trim().length === 0) return undefined;
+  return {
+    command: build.command.trim(),
+    args: Array.isArray(build.args) ? build.args.filter((arg): arg is string => typeof arg === 'string') : undefined,
+    output: typeof build.output === 'string' && build.output.trim().length > 0 ? build.output.trim() : undefined,
+    notes: typeof build.notes === 'string' && build.notes.trim().length > 0 ? build.notes.trim() : undefined
+  };
 }
 
 function normalizeManifest(raw: unknown): PluginManifest {
@@ -86,7 +139,11 @@ function normalizeManifest(raw: unknown): PluginManifest {
       : 'utility',
     entry: manifest.entry.trim(),
     permissions,
-    settings
+    settings,
+    hostKind: normalizeHostKind(manifest.hostKind),
+    language: normalizeLanguage(manifest.language),
+    runtime: normalizeRuntime(manifest.runtime),
+    build: normalizeBuild(manifest.build)
   };
 }
 
@@ -153,6 +210,13 @@ function dedupePlugins(plugins: InstalledPlugin[]): InstalledPlugin[] {
     ordered.set(plugin.id, plugin);
   }
   return [...ordered.values()];
+}
+
+function withSource(plugin: InstalledPlugin, source: PluginSource): InstalledPlugin {
+  return {
+    ...plugin,
+    source
+  };
 }
 
 export class PluginManager {
