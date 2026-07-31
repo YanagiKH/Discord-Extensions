@@ -1,6 +1,16 @@
+<div align="center">
+  <picture>
+    <img width="277.5" height="198" alt="Discord_Extensions" src="https://github.com/user-attachments/assets/00b0a90c-d3a9-4807-80c9-a50f5bf64897" />
+  </picture>
+
+[English](README.md) / [繁體中文](README_ZH.md) / [日本語](README_JP.md)
+</div>
+
 # Discord Extensions
 
 Discord Extensions is a standalone desktop plugin host for managing local Discord-related extensions through a control panel.
+
+This is my experimental project, and since it’s not an officially supported plugin, you’ll have to assume all risks yourself—though, Although this possibility is very low :)
 
 ## Included architecture
 
