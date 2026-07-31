@@ -4,6 +4,7 @@ import path from 'node:path';
 const ROOT = process.cwd();
 const REQUIRED_PATHS = [
   'package.json',
+  'tsconfig.json',
   'src/main.ts',
   'src/main/plugin-manager.ts',
   'src/preload.ts',
@@ -12,14 +13,21 @@ const REQUIRED_PATHS = [
   'src/shared/types.ts',
   'src/shared/ipc.ts',
   'src/shared/locales.ts',
+  '.editorconfig',
   '.github/workflows/ci.yml',
   '.github/workflows/samples.yml',
-  '.editorconfig',
   'plugins/samples/python-voice-guard/plugin.json',
+  'plugins/samples/python-voice-guard/main.py',
   'plugins/samples/go-quick-actions/plugin.json',
+  'plugins/samples/go-quick-actions/go.mod',
+  'plugins/samples/go-quick-actions/main.go',
   'plugins/samples/rust-safe-speaker/plugin.json',
+  'plugins/samples/rust-safe-speaker/Cargo.toml',
+  'plugins/samples/rust-safe-speaker/src/main.rs',
   'plugins/samples/c-voice-guard/plugin.json',
-  'plugins/samples/cpp-compact-sidebar/plugin.json'
+  'plugins/samples/c-voice-guard/main.c',
+  'plugins/samples/cpp-compact-sidebar/plugin.json',
+  'plugins/samples/cpp-compact-sidebar/main.cpp'
 ];
 
 async function exists(relativePath) {
