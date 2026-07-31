@@ -1,26 +1,25 @@
-import type { InstalledPlugin, PluginSettingField } from '../shared/types';
+import type { DiscordExtensionsApi } from '../shared/ipc';
+import type { InstalledPlugin, PluginImportResult, PluginSettingField } from '../shared/types';
 
 declare global {
   interface Window {
-    discordExtensions: {
-      listPlugins: () => Promise<InstalledPlugin[]>;
-      togglePlugin: (pluginId: string) => Promise<InstalledPlugin | null>;
-      updateSetting: (
-        pluginId: string,
-        key: string,
-        value: string | number | boolean
-      ) => Promise<{ key: string; value: string | number | boolean } | null>;
-      importPlugin: () => Promise<string[]>;
-    };
+    discordExtensions: DiscordExtensionsApi;
   }
 }
 
 const pluginList = document.getElementById('pluginList') as HTMLDivElement;
 const pluginDetail = document.getElementById('pluginDetail') as HTMLDivElement;
 const importBtn = document.getElementById('importBtn') as HTMLButtonElement;
+const refreshBtn = document.getElementById('refreshBtn') as HTMLButtonElement;
+const dataBtn = document.getElementById('dataBtn') as HTMLButtonElement;
+const statusLine = document.getElementById('statusLine') as HTMLParagraphElement;
 
 let plugins: InstalledPlugin[] = [];
 let selectedPluginId: string | null = null;
+
+function setStatus(message: string) {
+  statusLine.textContent = message;
+}
 
 function renderPlugins() {
   pluginList.innerHTML = '';
@@ -35,7 +34,7 @@ function renderPlugins() {
         <span class="badge ${plugin.state}">${plugin.state}</span>
       </div>
       <p>${plugin.description}</p>
-      <small>${plugin.category} · v${plugin.version} · ${plugin.source}</small>
+      <small>${plugin.category} · v${plugin.version} · ${plugin.source} · ${plugin.installPath}</small>
     `;
     card.addEventListener('click', () => {
       selectedPluginId = plugin.id;
@@ -47,9 +46,7 @@ function renderPlugins() {
 }
 
 function renderPluginDetail(plugin: InstalledPlugin) {
-  const settings = plugin.settings
-    .map((field) => renderSettingRow(plugin.id, field))
-    .join('');
+  const settings = plugin.settings.map((field) => renderSettingRow(plugin.id, field)).join('');
 
   pluginDetail.innerHTML = `
     <div class="detail-head">
@@ -90,6 +87,16 @@ function renderSettingRow(pluginId: string, field: PluginSettingField): string {
     `;
   }
 
+  if (field.type === 'select') {
+    const options = (field.options ?? []).map((option) => `<option ${option === field.value ? 'selected' : ''}>${option}</option>`).join('');
+    return `
+      <label class="setting-row">
+        <span>${field.label}</span>
+        <select data-plugin-id="${pluginId}" data-key="${field.key}">${options}</select>
+      </label>
+    `;
+  }
+
   return `
     <label class="setting-row">
       <span>${field.label}</span>
@@ -100,18 +107,20 @@ function renderSettingRow(pluginId: string, field: PluginSettingField): string {
 
 function bindSettingControls(pluginId: string, field: PluginSettingField) {
   const selector = `[data-plugin-id="${pluginId}"][data-key="${field.key}"]`;
-  const control = pluginDetail.querySelector<HTMLInputElement>(selector);
+  const control = pluginDetail.querySelector<HTMLInputElement | HTMLSelectElement>(selector);
   if (!control) return;
 
   control.addEventListener('change', async () => {
     let nextValue: string | number | boolean = control.value;
 
-    if (field.type === 'toggle') {
+    if (field.type === 'toggle' && control instanceof HTMLInputElement) {
       nextValue = control.checked;
     } else if (field.type === 'range') {
       nextValue = Number(control.value);
       const label = control.parentElement?.querySelector('strong');
-      if (label) label.textContent = control.value;
+      if (label) {
+        label.textContent = control.value;
+      }
     }
 
     await window.discordExtensions.updateSetting(pluginId, field.key, nextValue);
@@ -128,16 +137,40 @@ async function refresh() {
   const selected = plugins.find((plugin) => plugin.id === selectedPluginId);
   if (selected) {
     renderPluginDetail(selected);
+    setStatus(`已載入 ${plugins.length} 個插件。`);
   } else {
     pluginDetail.innerHTML = '<div class="detail-empty">選擇一個插件以編輯設定。</div>';
+    setStatus(`已載入 ${plugins.length} 個插件。`);
   }
 }
 
-importBtn.addEventListener('click', async () => {
-  const imported = await window.discordExtensions.importPlugin();
-  if (imported.length > 0) {
-    alert(`已選擇 ${imported.length} 個檔案，後續可接上安裝流程。`);
+function describeImportResult(result: PluginImportResult): string {
+  const installed = result.installed.length;
+  const failed = result.failed.length;
+  if (installed === 0 && failed === 0) {
+    return '未選擇任何可匯入的項目。';
   }
+  if (failed === 0) {
+    return `已匯入 ${installed} 個插件。`;
+  }
+  return `已匯入 ${installed} 個插件，另有 ${failed} 個項目失敗。`;
+}
+
+importBtn.addEventListener('click', async () => {
+  const result = await window.discordExtensions.importPlugins();
+  await refresh();
+  setStatus(describeImportResult(result));
+});
+
+refreshBtn.addEventListener('click', async () => {
+  await window.discordExtensions.refreshPlugins();
+  await refresh();
+  setStatus('已重新整理插件清單。');
+});
+
+dataBtn.addEventListener('click', async () => {
+  const folder = await window.discordExtensions.openDataFolder();
+  setStatus(`已開啟資料夾：${folder}`);
 });
 
 void refresh();
