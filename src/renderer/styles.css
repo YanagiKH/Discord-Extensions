@@ -1,0 +1,144 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, system-ui, sans-serif;
+  background: #111318;
+  color: #e8ebf2;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(180deg, #111318 0%, #161a22 100%);
+}
+
+#app {
+  padding: 24px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.topbar h1,
+.panel h2,
+.detail-head h3 {
+  margin: 0;
+}
+
+.topbar p,
+.detail-head p,
+.plugin-card p,
+.plugin-card small {
+  margin: 4px 0 0;
+  color: #98a2b3;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 20px;
+}
+
+.panel {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 18px;
+  min-height: 640px;
+}
+
+.plugin-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.plugin-card {
+  text-align: left;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: inherit;
+  cursor: pointer;
+}
+
+.plugin-card.selected {
+  border-color: rgba(108, 92, 231, 0.75);
+  background: rgba(108, 92, 231, 0.12);
+}
+
+.plugin-head,
+.detail-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.badge {
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.badge.enabled {
+  background: rgba(28, 200, 138, 0.18);
+  color: #7ef0bc;
+}
+
+.badge.disabled {
+  background: rgba(255, 99, 132, 0.18);
+  color: #ff9eb2;
+}
+
+.primary,
+.secondary {
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  color: #fff;
+}
+
+.primary {
+  background: #6c5ce7;
+}
+
+.secondary {
+  background: #343a46;
+}
+
+.settings-grid {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.setting-row {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.setting-row input[type='text'],
+.setting-row input[type='range'] {
+  width: 100%;
+}
+
+.detail-empty {
+  padding: 28px;
+  color: #98a2b3;
+}
+
+@media (max-width: 960px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
