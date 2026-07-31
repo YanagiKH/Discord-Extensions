@@ -1,13 +1,26 @@
 :root {
   color-scheme: dark;
-  font-family: Inter, system-ui, sans-serif;
+  --font-scale: 1;
+  --ui-font: "Inter", "Noto Sans TC", "Noto Sans JP", "Noto Sans SC", "Microsoft JhengHei", "Meiryo", "Segoe UI", system-ui, sans-serif;
   background: #111318;
   color: #e8ebf2;
+  font-family: var(--ui-font);
+}
+
+html {
+  font-size: calc(16px * var(--font-scale));
 }
 
 body {
   margin: 0;
   background: linear-gradient(180deg, #111318 0%, #161a22 100%);
+  font-family: var(--ui-font);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+body.compact-mode #app {
+  padding: 18px;
 }
 
 #app {
@@ -29,6 +42,18 @@ body {
   justify-content: flex-end;
 }
 
+.inline-field {
+  display: grid;
+  gap: 6px;
+  min-width: 120px;
+  align-items: center;
+}
+
+.inline-field span {
+  font-size: 0.9rem;
+  color: #98a2b3;
+}
+
 .topbar h1,
 .panel h2,
 .detail-head h3 {
@@ -38,14 +63,26 @@ body {
 .topbar p,
 .detail-head p,
 .plugin-card p,
-.plugin-card small {
+.plugin-card small,
+.detail-meta small,
+.hint-text {
   margin: 4px 0 0;
   color: #98a2b3;
 }
 
+.status-line {
+  min-height: auto;
+  padding-top: 0;
+}
+
 .layout {
   display: grid;
-  grid-template-columns: 1fr 1.2fr;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 20px;
+}
+
+.right-column {
+  display: grid;
   gap: 20px;
 }
 
@@ -54,7 +91,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   padding: 18px;
-  min-height: 640px;
+  min-height: 0;
 }
 
 .plugin-list {
@@ -79,11 +116,19 @@ body {
 }
 
 .plugin-head,
-.detail-head {
+.detail-head,
+.buttons-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+}
+
+.detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 10px;
 }
 
 .badge {
@@ -145,11 +190,13 @@ body {
   color: #98a2b3;
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1100px) {
   .layout {
     grid-template-columns: 1fr;
   }
+}
 
+@media (max-width: 960px) {
   .topbar {
     align-items: flex-start;
     flex-direction: column;
