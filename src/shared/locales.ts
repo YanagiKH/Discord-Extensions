@@ -35,9 +35,11 @@ export interface LocaleBundle {
   };
   status: {
     loading: string;
+    loaded: string;
     refreshed: string;
     openedFolder: string;
     imported: string;
+    importedWithFailures: string;
     noneSelected: string;
   };
 }
@@ -78,9 +80,11 @@ const bundles: Record<UILocale, LocaleBundle> = {
     },
     status: {
       loading: 'Loading plugins...',
+      loaded: 'plugins loaded.',
       refreshed: 'Plugin list refreshed.',
       openedFolder: 'Workspace opened.',
       imported: 'Import completed.',
+      importedWithFailures: 'Import completed with failures.',
       noneSelected: 'No plugin selected.'
     }
   },
@@ -119,9 +123,11 @@ const bundles: Record<UILocale, LocaleBundle> = {
     },
     status: {
       loading: 'プラグインを読み込み中...',
+      loaded: '個のプラグインを読み込みました。',
       refreshed: 'プラグイン一覧を更新しました。',
       openedFolder: '作業フォルダを開きました。',
       imported: '読み込みが完了しました。',
+      importedWithFailures: '一部の読み込みに失敗しました。',
       noneSelected: 'プラグインが選択されていません。'
     }
   },
@@ -160,9 +166,11 @@ const bundles: Record<UILocale, LocaleBundle> = {
     },
     status: {
       loading: '正在載入插件...',
+      loaded: '個插件已載入。',
       refreshed: '已重新整理插件清單。',
       openedFolder: '已開啟工作資料夾。',
       imported: '匯入完成。',
+      importedWithFailures: '匯入完成，但有部分項目失敗。',
       noneSelected: '尚未選擇插件。'
     }
   }
