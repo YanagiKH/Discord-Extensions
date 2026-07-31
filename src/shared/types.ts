@@ -1,4 +1,14 @@
 export type PluginState = 'enabled' | 'disabled';
+export type PluginCategory = 'audio' | 'ui' | 'automation' | 'integration' | 'utility';
+export type PluginSource = 'built-in' | 'local-import' | 'package';
+export type PluginPermission =
+  | 'voice-volume-read'
+  | 'voice-volume-normalize'
+  | 'tray-control'
+  | 'file-import'
+  | 'ui-panel'
+  | 'settings-persistence'
+  | 'auto-start';
 
 export interface PluginSettingField {
   key: string;
@@ -17,12 +27,30 @@ export interface PluginManifest {
   version: string;
   description: string;
   author: string;
-  state: PluginState;
-  category: 'audio' | 'ui' | 'automation' | 'integration' | 'utility';
+  category: PluginCategory;
+  entry: string;
+  permissions: PluginPermission[];
   settings: PluginSettingField[];
 }
 
 export interface InstalledPlugin extends PluginManifest {
+  state: PluginState;
   installPath: string;
-  source: 'built-in' | 'local-import' | 'package';
+  manifestPath: string;
+  source: PluginSource;
+}
+
+export interface PluginStoreRecord {
+  enabled: boolean;
+  settings: Record<string, string | number | boolean>;
+}
+
+export interface PluginImportFailure {
+  sourcePath: string;
+  reason: string;
+}
+
+export interface PluginImportResult {
+  installed: InstalledPlugin[];
+  failed: PluginImportFailure[];
 }
