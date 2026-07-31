@@ -1,0 +1,50 @@
+name: Sample Plugins
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'
+
+jobs:
+  validate-python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m py_compile plugins/samples/python-voice-guard/main.py
+
+  validate-go:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+      - working-directory: plugins/samples/go-quick-actions
+        run: go build ./...
+
+  validate-rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - working-directory: plugins/samples/rust-safe-speaker
+        run: cargo check --locked
+
+  validate-c:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y build-essential
+      - working-directory: plugins/samples/c-voice-guard
+        run: gcc -std=c11 -Wall -Wextra -Werror main.c -o c-voice-guard
+
+  validate-cpp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y build-essential
+      - working-directory: plugins/samples/cpp-compact-sidebar
+        run: g++ -std=c++17 -Wall -Wextra -Werror main.cpp -o cpp-compact-sidebar
