@@ -1,0 +1,43 @@
+{
+  "id": "go-quick-actions",
+  "name": "Go Quick Actions",
+  "version": "1.0.0",
+  "description": "Go tool plugin that emits quick action suggestions for the host.",
+  "author": "YanagiKH",
+  "category": "utility",
+  "entry": "main.go",
+  "permissions": [
+    "ui-panel",
+    "tray-control",
+    "settings-persistence"
+  ],
+  "settings": [
+    {
+      "key": "shortcutCount",
+      "label": "Shortcut count",
+      "type": "range",
+      "value": 4,
+      "min": 1,
+      "max": 12,
+      "step": 1
+    },
+    {
+      "key": "autoPin",
+      "label": "Auto pin",
+      "type": "toggle",
+      "value": true
+    }
+  ],
+  "hostKind": "tool",
+  "language": "go",
+  "runtime": {
+    "command": "go",
+    "args": ["run", "."]
+  },
+  "build": {
+    "command": "go",
+    "args": ["build", "-o", "bin/go-quick-actions"],
+    "output": "bin/go-quick-actions",
+    "notes": "Produces a standalone binary for the plugin package."
+  }
+}
