@@ -1,0 +1,98 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate-app:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build desktop host
+        run: npm run build
+
+      - name: Validate repository layout
+        run: npm run validate:repo
+
+  validate-python-sample:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Syntax check
+        run: python -m py_compile plugins/samples/python-voice-guard/main.py
+
+  validate-go-sample:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: Build sample
+        working-directory: plugins/samples/go-quick-actions
+        run: go build ./...
+
+  validate-rust-sample:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cargo check
+        working-directory: plugins/samples/rust-safe-speaker
+        run: cargo check --locked
+
+  validate-c-sample:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install build tools
+        run: sudo apt-get update && sudo apt-get install -y build-essential
+
+      - name: Compile C sample
+        working-directory: plugins/samples/c-voice-guard
+        run: gcc -std=c11 -Wall -Wextra -Werror main.c -o c-voice-guard
+
+  validate-cpp-sample:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install build tools
+        run: sudo apt-get update && sudo apt-get install -y build-essential
+
+      - name: Compile C++ sample
+        working-directory: plugins/samples/cpp-compact-sidebar
+        run: g++ -std=c++17 -Wall -Wextra -Werror main.cpp -o cpp-compact-sidebar
