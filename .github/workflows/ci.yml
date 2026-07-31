@@ -69,7 +69,7 @@ jobs:
 
       - name: Cargo check
         working-directory: plugins/samples/rust-safe-speaker
-        run: cargo check --locked
+        run: cargo check
 
   validate-c-sample:
     runs-on: ubuntu-latest
