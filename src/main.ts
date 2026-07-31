@@ -1,12 +1,15 @@
 import { app, BrowserWindow, dialog, ipcMain, type IpcMainInvokeEvent, type Tray } from 'electron';
 import path from 'node:path';
+import { defaultAppSettings, type AppSettings } from './shared/app-settings';
 import { IPC_CHANNELS } from './shared/ipc';
 import { createAppTray } from './main/tray';
 import { PluginManager } from './main/plugin-manager';
+import { readAppSettings, updateAppSettings } from './main/app-settings';
 
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let isQuitting = false;
+let appSettings: AppSettings = { ...defaultAppSettings };
 const pluginManager = new PluginManager();
 
 function createWindow() {
@@ -15,11 +18,12 @@ function createWindow() {
   }
 
   mainWindow = new BrowserWindow({
-    width: 1280,
-    height: 860,
-    minWidth: 1100,
-    minHeight: 720,
+    width: 1320,
+    height: 900,
+    minWidth: 1140,
+    minHeight: 760,
     title: 'Discord Extensions',
+    show: !appSettings.startHidden,
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.js'),
       contextIsolation: true,
@@ -38,11 +42,17 @@ function createWindow() {
   });
 
   mainWindow.on('close', (event) => {
-    if (!isQuitting) {
+    if (!isQuitting && appSettings.minimizeToTray) {
       event.preventDefault();
       mainWindow?.hide();
     }
   });
+
+  if (!appSettings.startHidden) {
+    mainWindow.show();
+  } else {
+    mainWindow.hide();
+  }
 
   return mainWindow;
 }
@@ -54,6 +64,10 @@ function showWindow() {
   }
   window.show();
   window.focus();
+}
+
+function broadcastAppSettings() {
+  mainWindow?.webContents.send(IPC_CHANNELS.appSettingsUpdated, appSettings);
 }
 
 function registerIpc() {
@@ -86,31 +100,52 @@ function registerIpc() {
     return pluginManager.importPlugins(result.filePaths);
   });
 
-  ipcMain.handle(IPC_CHANNELS.refreshPlugins, async () => pluginManager.refresh());
+  ipcMain.handle(IPC_CHANNELS.refreshPlugins, async () => {
+    const refreshed = await pluginManager.refresh();
+    mainWindow?.webContents.send(IPC_CHANNELS.pluginsRefreshed);
+    return refreshed;
+  });
+
   ipcMain.handle(IPC_CHANNELS.openDataFolder, async () => pluginManager.openDataFolder());
   ipcMain.handle(IPC_CHANNELS.setAutoStart, async (_event: IpcMainInvokeEvent, enabled: boolean) => {
+    appSettings = await updateAppSettings(appSettings, { autoStart: enabled });
+    broadcastAppSettings();
     return pluginManager.setAutoStart(enabled);
+  });
+
+  ipcMain.handle(IPC_CHANNELS.getAppSettings, async () => appSettings);
+  ipcMain.handle(IPC_CHANNELS.updateAppSettings, async (_event: IpcMainInvokeEvent, patch: Partial<AppSettings>) => {
+    appSettings = await updateAppSettings(appSettings, patch);
+    if (typeof patch.autoStart === 'boolean') {
+      await pluginManager.setAutoStart(appSettings.autoStart);
+    }
+    broadcastAppSettings();
+    return appSettings;
   });
 }
 
 async function startApplication() {
+  appSettings = await readAppSettings();
   await pluginManager.initialize();
+  await pluginManager.setAutoStart(appSettings.autoStart);
   registerIpc();
-  showWindow();
+  createWindow();
 
   tray = createAppTray({
     showWindow,
     refreshPlugins: async () => {
       await pluginManager.refresh();
-      if (mainWindow && !mainWindow.isDestroyed()) {
-        mainWindow.webContents.send('plugins:refreshed');
-      }
+      mainWindow?.webContents.send(IPC_CHANNELS.pluginsRefreshed);
     },
     quitApp: () => {
       isQuitting = true;
       app.quit();
     }
   });
+
+  if (!appSettings.startHidden) {
+    showWindow();
+  }
 }
 
 const hasSingleInstance = app.requestSingleInstanceLock();
@@ -136,7 +171,7 @@ if (!hasSingleInstance) {
   });
 
   app.on('window-all-closed', (event) => {
-    if (!isQuitting) {
+    if (!isQuitting && appSettings.minimizeToTray) {
       event.preventDefault();
     }
   });
