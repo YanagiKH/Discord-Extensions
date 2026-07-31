@@ -4,6 +4,7 @@ import path from 'node:path';
 const ROOT = process.cwd();
 const REQUIRED_PATHS = [
   'package.json',
+  'package-lock.json',
   'tsconfig.json',
   'start.bat',
   'src/main.ts',
