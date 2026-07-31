@@ -290,7 +290,7 @@ async function refreshPlugins() {
   const selected = plugins.find((plugin) => plugin.id === selectedPluginId);
   if (selected) {
     renderPluginDetail(selected);
-    setStatus(`${plugins.length} plugins loaded.`);
+    setStatus(`${plugins.length} ${localeBundle.status.loaded}`);
   } else {
     pluginDetail.innerHTML = `<div class="detail-empty">${escapeHtml(localeBundle.labels.selectPlugin)}</div>`;
     setStatus(localeBundle.status.noneSelected);
@@ -304,9 +304,9 @@ function describeImportResult(result: PluginImportResult): string {
     return localeBundle.labels.importHint;
   }
   if (failed === 0) {
-    return `${installed} plugins imported.`;
+    return localeBundle.status.imported;
   }
-  return `${installed} plugins imported, ${failed} failed.`;
+  return localeBundle.status.importedWithFailures;
 }
 
 async function loadAppSettings() {
