@@ -1,0 +1,39 @@
+{
+  "id": "cpp-compact-sidebar",
+  "name": "C++ Compact Sidebar",
+  "version": "1.0.0",
+  "description": "C++ tool plugin that emits compact sidebar suggestions and spacing rules.",
+  "author": "YanagiKH",
+  "category": "ui",
+  "entry": "main.cpp",
+  "permissions": [
+    "ui-panel",
+    "settings-persistence"
+  ],
+  "settings": [
+    {
+      "key": "density",
+      "label": "Density",
+      "type": "select",
+      "value": "balanced",
+      "options": ["compact", "balanced", "comfortable"]
+    },
+    {
+      "key": "showChannelBadges",
+      "label": "Show channel badges",
+      "type": "toggle",
+      "value": false
+    }
+  ],
+  "hostKind": "tool",
+  "language": "cpp",
+  "runtime": {
+    "command": "bin/cpp-compact-sidebar"
+  },
+  "build": {
+    "command": "g++",
+    "args": ["-std=c++17", "-O2", "-Wall", "-Wextra", "-Werror", "main.cpp", "-o", "bin/cpp-compact-sidebar"],
+    "output": "bin/cpp-compact-sidebar",
+    "notes": "Compile before running."
+  }
+}
