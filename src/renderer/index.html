@@ -13,8 +13,14 @@
           <h1>Discord Extensions</h1>
           <p>插件管理、設定與本機安裝入口</p>
         </div>
-        <button id="importBtn" class="primary">載入插件</button>
+        <div class="toolbar">
+          <button id="importBtn" class="primary">載入插件</button>
+          <button id="refreshBtn" class="secondary">重新整理</button>
+          <button id="dataBtn" class="secondary">開啟資料夾</button>
+        </div>
       </header>
+
+      <p id="statusLine" class="detail-empty" style="min-height: auto; padding-top: 0;"></p>
 
       <main class="layout">
         <section class="panel">
