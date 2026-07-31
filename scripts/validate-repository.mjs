@@ -5,6 +5,7 @@ const ROOT = process.cwd();
 const REQUIRED_PATHS = [
   'package.json',
   'tsconfig.json',
+  'start.bat',
   'src/main.ts',
   'src/main/plugin-manager.ts',
   'src/preload.ts',
@@ -14,8 +15,18 @@ const REQUIRED_PATHS = [
   'src/shared/ipc.ts',
   'src/shared/locales.ts',
   '.editorconfig',
+  '.github/CONTRIBUTING.md',
+  '.github/SECURITY.md',
   '.github/workflows/ci.yml',
   '.github/workflows/samples.yml',
+  '.github/workflows/browser-extension.yml',
+  'browser-extension/manifest.json',
+  'browser-extension/background.js',
+  'browser-extension/content.js',
+  'browser-extension/popup.html',
+  'browser-extension/popup.js',
+  'browser-extension/styles.css',
+  'browser-extension/settings.js',
   'plugins/samples/python-voice-guard/plugin.json',
   'plugins/samples/python-voice-guard/main.py',
   'plugins/samples/go-quick-actions/plugin.json',
@@ -63,6 +74,8 @@ async function main() {
   const pkg = await loadJson('package.json');
   assert(pkg.scripts && typeof pkg.scripts === 'object', 'package.json scripts object missing');
   assert(typeof pkg.scripts['validate:repo'] === 'string', 'validate:repo script missing');
+  assert(typeof pkg.scripts['validate:browser-extension'] === 'string', 'validate:browser-extension script missing');
+  assert(typeof pkg.scripts['start:desktop'] === 'string', 'start:desktop script missing');
 
   const samplePlugins = [
     'plugins/samples/python-voice-guard/plugin.json',
@@ -84,6 +97,11 @@ async function main() {
     assert(manifest.runtime && typeof manifest.runtime.command === 'string', `${manifestPath} runtime missing command`);
     assert(manifest.build && typeof manifest.build.command === 'string', `${manifestPath} build missing command`);
   }
+
+  const browserManifest = await loadJson('browser-extension/manifest.json');
+  assert(browserManifest.manifest_version === 3, 'browser-extension manifest must use MV3');
+  assert(typeof browserManifest.action?.default_popup === 'string', 'browser-extension popup missing');
+  assert(Array.isArray(browserManifest.content_scripts), 'browser-extension content scripts missing');
 
   console.log('Repository validation passed.');
 }
