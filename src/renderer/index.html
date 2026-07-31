@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Discord Extensions</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <div>
+          <h1>Discord Extensions</h1>
+          <p>插件管理、設定與本機安裝入口</p>
+        </div>
+        <button id="importBtn" class="primary">載入插件</button>
+      </header>
+
+      <main class="layout">
+        <section class="panel">
+          <h2>插件清單</h2>
+          <div id="pluginList" class="plugin-list"></div>
+        </section>
+
+        <section class="panel">
+          <h2>詳細設定</h2>
+          <div id="pluginDetail" class="detail-empty">選擇一個插件以編輯設定。</div>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="./app.ts"></script>
+  </body>
+</html>
