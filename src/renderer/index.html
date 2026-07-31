@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,27 +10,38 @@
     <div id="app">
       <header class="topbar">
         <div>
-          <h1>Discord Extensions</h1>
-          <p>插件管理、設定與本機安裝入口</p>
+          <h1 id="appTitle">Discord Extensions</h1>
+          <p id="appSubtitle">Plugin management, settings, and local installs</p>
         </div>
         <div class="toolbar">
-          <button id="importBtn" class="primary">載入插件</button>
-          <button id="refreshBtn" class="secondary">重新整理</button>
-          <button id="dataBtn" class="secondary">開啟資料夾</button>
+          <label class="inline-field">
+            <span id="languageLabel">Language</span>
+            <select id="languageSelect"></select>
+          </label>
+          <button id="importBtn" class="primary">Import plugins</button>
+          <button id="refreshBtn" class="secondary">Refresh</button>
+          <button id="dataBtn" class="secondary">Open data folder</button>
         </div>
       </header>
 
-      <p id="statusLine" class="detail-empty" style="min-height: auto; padding-top: 0;"></p>
+      <p id="statusLine" class="detail-empty status-line"></p>
 
       <main class="layout">
         <section class="panel">
-          <h2>插件清單</h2>
+          <h2 id="pluginsHeader">Plugin list</h2>
           <div id="pluginList" class="plugin-list"></div>
         </section>
 
-        <section class="panel">
-          <h2>詳細設定</h2>
-          <div id="pluginDetail" class="detail-empty">選擇一個插件以編輯設定。</div>
+        <section class="right-column">
+          <section class="panel">
+            <h2 id="detailsHeader">Plugin details</h2>
+            <div id="pluginDetail" class="detail-empty">Select a plugin to edit its settings.</div>
+          </section>
+
+          <section class="panel">
+            <h2 id="globalSettingsHeader">Global customization</h2>
+            <div id="globalSettings" class="settings-grid"></div>
+          </section>
         </section>
       </main>
     </div>
