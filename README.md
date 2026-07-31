@@ -1,30 +1,32 @@
 # Discord Extensions
 
-Discord Extensions is a desktop companion project for managing local Discord plugin modules through a standalone control panel.
+Discord Extensions is a standalone desktop plugin host for managing local Discord-related extensions through a control panel.
 
-## Included scaffold
+## Included architecture
 
 - Electron + TypeScript UI shell
-- Plugin registry and manifest model
-- Default volume-limiter plugin template
-- Plugin install flow placeholder for local `.zip` / folder imports
-- Java bridge placeholder for future native helpers
+- Shared manifest and IPC contract layer
+- Built-in volume-limiter plugin template
+- Local plugin import for `.zip`, folders, and `plugin.json`
+- Persistent plugin state and settings storage
+- Tray-based launch and single-instance behavior
+- Java bridge module for future native helpers
 
-## What this repository currently provides
-
-This scaffold is designed to be extended into a modular plugin host with:
+## What the current repository provides
 
 - plugin enable / disable toggles
-- per-plugin settings via a gear menu
-- local plugin import support
-- startup integration for Windows
+- per-plugin settings through a gear-style detail panel
+- manifest scanning for imported plugins
+- archive extraction into the local plugin workspace
+- workspace folder access for installed plugins and state
 
 ## Main scripts
 
 - `npm install`
 - `npm run dev`
 - `npm run build`
+- `npm run typecheck`
 
-## Note
+## Boundary
 
-The current scaffold focuses on the management layer and plugin architecture. Any Discord client integration should be implemented separately and in a way that respects Discord's platform rules.
+This repository is implemented as a separate companion host and does not modify the Discord client installation directory or inject code into the Discord application.
