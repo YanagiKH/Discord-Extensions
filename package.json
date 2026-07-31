@@ -1,0 +1,21 @@
+{
+  "name": "discord-extensions",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Discord Extensions companion app and plugin host",
+  "main": "dist/main.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "electron": "^32.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "electron-vite": "^2.3.0",
+    "typescript": "^5.8.2"
+  }
+}
