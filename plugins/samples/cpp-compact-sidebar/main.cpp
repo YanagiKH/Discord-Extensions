@@ -1,6 +1,5 @@
-#include <cmath>
+#include <algorithm>
 #include <iostream>
-#include <limits>
 #include <string>
 
 static double clamp(double value, double min_value, double max_value) {
