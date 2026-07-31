@@ -86,7 +86,7 @@ function renderPlugins() {
       </div>
       <p>${escapeHtml(plugin.description)}</p>
       <small>${escapeHtml(plugin.category)} · v${escapeHtml(plugin.version)} · ${escapeHtml(describeSource(plugin.source))}</small>
-      <small>${escapeHtml(localeBundle.labels.state)}: ${escapeHtml(plugin.state)}</small>
+      <small>${escapeHtml(localeBundle.labels.state)}: ${escapeHtml(plugin.state === 'enabled' ? localeBundle.labels.enabled : localeBundle.labels.disabled)}</small>
     `;
     card.addEventListener('click', () => {
       selectedPluginId = plugin.id;
@@ -171,7 +171,7 @@ function renderPluginDetail(plugin: InstalledPlugin) {
       <button id="toggleBtn" class="secondary">${plugin.state === 'enabled' ? localeBundle.labels.disabled : localeBundle.labels.enabled}</button>
     </div>
     <div class="detail-meta">
-      <small>${escapeHtml(localeBundle.labels.state)}: ${escapeHtml(plugin.state)}</small>
+      <small>${escapeHtml(localeBundle.labels.state)}: ${escapeHtml(plugin.state === 'enabled' ? localeBundle.labels.enabled : localeBundle.labels.disabled)}</small>
       <small>${escapeHtml(plugin.permissions.join(' · '))}</small>
     </div>
     <div class="settings-grid">${settings}</div>
