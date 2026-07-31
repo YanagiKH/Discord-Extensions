@@ -72,6 +72,27 @@ function describeSource(source: InstalledPlugin['source']): string {
   return 'Package';
 }
 
+function describeHostKind(plugin: InstalledPlugin): string {
+  return plugin.hostKind === 'tool' ? 'Tool' : 'Panel';
+}
+
+function describeLanguage(plugin: InstalledPlugin): string {
+  return plugin.language ?? 'typescript';
+}
+
+function describeRuntime(plugin: InstalledPlugin): string {
+  if (!plugin.runtime) return '—';
+  const args = plugin.runtime.args && plugin.runtime.args.length > 0 ? ` ${plugin.runtime.args.join(' ')}` : '';
+  return `${plugin.runtime.command}${args}`;
+}
+
+function describeBuild(plugin: InstalledPlugin): string {
+  if (!plugin.build) return '—';
+  const args = plugin.build.args && plugin.build.args.length > 0 ? ` ${plugin.build.args.join(' ')}` : '';
+  const output = plugin.build.output ? ` → ${plugin.build.output}` : '';
+  return `${plugin.build.command}${args}${output}`;
+}
+
 function renderPlugins() {
   pluginList.innerHTML = '';
 
@@ -86,7 +107,7 @@ function renderPlugins() {
       </div>
       <p>${escapeHtml(plugin.description)}</p>
       <small>${escapeHtml(plugin.category)} · v${escapeHtml(plugin.version)} · ${escapeHtml(describeSource(plugin.source))}</small>
-      <small>${escapeHtml(localeBundle.labels.state)}: ${escapeHtml(plugin.state === 'enabled' ? localeBundle.labels.enabled : localeBundle.labels.disabled)}</small>
+      <small>${escapeHtml(describeHostKind(plugin))} · ${escapeHtml(describeLanguage(plugin))} · ${escapeHtml(localeBundle.labels.state)}: ${escapeHtml(plugin.state === 'enabled' ? localeBundle.labels.enabled : localeBundle.labels.disabled)}</small>
     `;
     card.addEventListener('click', () => {
       selectedPluginId = plugin.id;
@@ -172,7 +193,11 @@ function renderPluginDetail(plugin: InstalledPlugin) {
     </div>
     <div class="detail-meta">
       <small>${escapeHtml(localeBundle.labels.state)}: ${escapeHtml(plugin.state === 'enabled' ? localeBundle.labels.enabled : localeBundle.labels.disabled)}</small>
+      <small>${escapeHtml(describeHostKind(plugin))}</small>
+      <small>${escapeHtml(describeLanguage(plugin))}</small>
       <small>${escapeHtml(plugin.permissions.join(' · '))}</small>
+      <small>runtime: ${escapeHtml(describeRuntime(plugin))}</small>
+      <small>build: ${escapeHtml(describeBuild(plugin))}</small>
     </div>
     <div class="settings-grid">${settings}</div>
   `;
