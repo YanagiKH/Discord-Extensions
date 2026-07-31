@@ -1,0 +1,32 @@
+{
+  "id": "volume-lock",
+  "name": "Volume Lock",
+  "version": "1.0.0",
+  "description": "Keeps incoming voice levels within a safe range.",
+  "author": "YanagiKH",
+  "category": "audio",
+  "entry": "volume-lock.ts",
+  "settings": [
+    {
+      "key": "targetVolume",
+      "label": "Target volume",
+      "type": "range",
+      "value": 70,
+      "min": 0,
+      "max": 100,
+      "step": 1
+    },
+    {
+      "key": "autoNormalize",
+      "label": "Auto normalize",
+      "type": "toggle",
+      "value": true
+    },
+    {
+      "key": "showBadge",
+      "label": "Show status badge",
+      "type": "toggle",
+      "value": true
+    }
+  ]
+}
