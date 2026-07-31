@@ -9,6 +9,8 @@ export type PluginPermission =
   | 'ui-panel'
   | 'settings-persistence'
   | 'auto-start';
+export type PluginHostKind = 'panel' | 'tool';
+export type PluginLanguage = 'typescript' | 'javascript' | 'python' | 'go' | 'rust' | 'c' | 'cpp';
 
 export interface PluginSettingField {
   key: string;
@@ -21,6 +23,20 @@ export interface PluginSettingField {
   step?: number;
 }
 
+export interface PluginRuntimeSpec {
+  command: string;
+  args?: string[];
+  cwd?: string;
+  shell?: boolean;
+}
+
+export interface PluginBuildSpec {
+  command: string;
+  args?: string[];
+  output?: string;
+  notes?: string;
+}
+
 export interface PluginManifest {
   id: string;
   name: string;
@@ -31,6 +47,10 @@ export interface PluginManifest {
   entry: string;
   permissions: PluginPermission[];
   settings: PluginSettingField[];
+  hostKind?: PluginHostKind;
+  language?: PluginLanguage;
+  runtime?: PluginRuntimeSpec;
+  build?: PluginBuildSpec;
 }
 
 export interface InstalledPlugin extends PluginManifest {
