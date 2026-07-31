@@ -1,0 +1,46 @@
+{
+  "id": "python-voice-guard",
+  "name": "Python Voice Guard",
+  "version": "1.0.0",
+  "description": "Python tool plugin that normalizes voice levels into a safe range.",
+  "author": "YanagiKH",
+  "category": "audio",
+  "entry": "main.py",
+  "permissions": [
+    "voice-volume-read",
+    "voice-volume-normalize",
+    "ui-panel",
+    "settings-persistence"
+  ],
+  "settings": [
+    {
+      "key": "targetVolume",
+      "label": "Target volume",
+      "type": "range",
+      "value": 70,
+      "min": 0,
+      "max": 100,
+      "step": 1
+    },
+    {
+      "key": "smoothing",
+      "label": "Smoothing",
+      "type": "range",
+      "value": 0.35,
+      "min": 0,
+      "max": 1,
+      "step": 0.05
+    }
+  ],
+  "hostKind": "tool",
+  "language": "python",
+  "runtime": {
+    "command": "python",
+    "args": ["main.py"]
+  },
+  "build": {
+    "command": "python",
+    "args": ["-m", "py_compile", "main.py"],
+    "notes": "Syntax validation only."
+  }
+}
