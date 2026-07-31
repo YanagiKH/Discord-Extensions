@@ -10,7 +10,8 @@
 
 Discord Extensions is a standalone desktop plugin host plus a Chromium browser companion for managing local Discord-related extensions through a control panel and a web UI helper.
 
-This is an experimental project, and it is not an officially supported Discord plugin system. Use it at your own discretion.
+> [!CAUTION]
+> This is an experimental project, and it is not an officially supported Discord plugin system. Use it at your own discretion.
 
 ## Included architecture
 
@@ -56,6 +57,5 @@ This is an experimental project, and it is not an officially supported Discord p
 - `npm run validate:repo`
 - `npm run validate:browser-extension`
 
-## Boundary
-
-This repository is implemented as a separate companion host and browser extension. It does not modify the Discord client installation directory or inject code into the Discord application.
+> [!NOTE]
+> This repository is implemented as a separate companion host and browser extension. It does not modify the Discord client installation directory or inject code into the Discord application.

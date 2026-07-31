@@ -10,7 +10,8 @@
 
 Discord Extensions 是一個獨立的桌面插件主機，另外也提供 Chromium 瀏覽器擴充功能，可透過控制面板與網頁介面輔助工具管理本機的 Discord 相關擴充內容。
 
-這是一個實驗性專案，並非官方支援的 Discord 插件系統，請自行評估風險後使用。
+> [!CAUTION]
+> 這是一個實驗性專案，並非官方支援的 Discord 插件系統，請自行評估風險後使用。
 
 ## 包含的架構
 
@@ -56,6 +57,5 @@ Discord Extensions 是一個獨立的桌面插件主機，另外也提供 Chromi
 - `npm run validate:repo`
 - `npm run validate:browser-extension`
 
-## 邊界說明
-
-此儲存庫以獨立的輔助主機與瀏覽器擴充功能形式實作，不會修改 Discord 客戶端安裝目錄，也不會將程式碼注入 Discord 應用程式中。
+> [!NOTE]
+> 此儲存庫以獨立的輔助主機與瀏覽器擴充功能形式實作，不會修改 Discord 客戶端安裝目錄，也不會將程式碼注入 Discord 應用程式中。
