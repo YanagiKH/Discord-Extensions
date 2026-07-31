@@ -14,7 +14,7 @@ function createWindow() {
     minHeight: 720,
     title: 'Discord Extensions',
     webPreferences: {
-      preload: path.join(__dirname, '../preload/preload.js'),
+      preload: path.join(__dirname, '../preload/index.js'),
       contextIsolation: true,
       nodeIntegration: false
     }
