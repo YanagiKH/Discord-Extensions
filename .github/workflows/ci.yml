@@ -28,6 +28,9 @@ jobs:
       - name: Validate repository layout
         run: npm run validate:repo
 
+      - name: Validate browser extension bundle
+        run: npm run validate:browser-extension
+
   validate-python-sample:
     runs-on: ubuntu-latest
     steps:
