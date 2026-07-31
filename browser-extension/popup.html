@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Discord Extensions</title>
+    <style>
+      body {
+        margin: 0;
+        min-width: 320px;
+        background: #111318;
+        color: #e8ebf2;
+        font-family: Inter, system-ui, sans-serif;
+      }
+      .wrap {
+        padding: 16px;
+        display: grid;
+        gap: 12px;
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .card {
+        padding: 12px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.04);
+      }
+      input[type='range'] {
+        width: 100%;
+      }
+      button {
+        border: 0;
+        border-radius: 10px;
+        padding: 10px 12px;
+        cursor: pointer;
+        background: #5865f2;
+        color: #fff;
+      }
+      small {
+        color: #98a2b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div>
+        <strong>Discord Extensions</strong>
+        <div><small>Chromium browser companion settings</small></div>
+      </div>
+
+      <label class="card row"><span>Compact layout</span><input id="compactMode" type="checkbox"></label>
+      <label class="card"><span class="row"><span>Font scale</span><strong id="fontScaleLabel">1.00</strong></span><input id="fontScale" type="range" min="0.85" max="1.40" step="0.05"></label>
+      <label class="card"><span class="row"><span>Sidebar width</span><strong id="sidebarLabel">320</strong></span><input id="sidebarWidth" type="range" min="240" max="420" step="4"></label>
+      <label class="card row"><span>Reduce motion</span><input id="reduceMotion" type="checkbox"></label>
+      <label class="card row"><span>Hide Nitro pills</span><input id="hideNitroPills" type="checkbox"></label>
+      <label class="card row"><span>Quick controls</span><input id="showQuickControls" type="checkbox"></label>
+
+      <button id="saveBtn" type="button">Save</button>
+      <small>Open Discord web after saving to see the panel and page tweaks.</small>
+    </div>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>
