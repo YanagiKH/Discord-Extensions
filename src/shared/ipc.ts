@@ -1,3 +1,4 @@
+import type { AppSettings } from './app-settings';
 import type { InstalledPlugin, PluginImportResult } from './types';
 
 export const IPC_CHANNELS = {
@@ -7,7 +8,11 @@ export const IPC_CHANNELS = {
   importPlugins: 'plugins:import',
   refreshPlugins: 'plugins:refresh',
   openDataFolder: 'app:open-data-folder',
-  setAutoStart: 'app:set-autostart'
+  setAutoStart: 'app:set-autostart',
+  getAppSettings: 'app:get-settings',
+  updateAppSettings: 'app:update-settings',
+  pluginsRefreshed: 'plugins:refreshed',
+  appSettingsUpdated: 'app:settings-updated'
 } as const;
 
 export interface DiscordExtensionsApi {
@@ -22,4 +27,8 @@ export interface DiscordExtensionsApi {
   refreshPlugins: () => Promise<InstalledPlugin[]>;
   openDataFolder: () => Promise<string>;
   setAutoStart: (enabled: boolean) => Promise<boolean>;
+  getAppSettings: () => Promise<AppSettings>;
+  updateAppSettings: (settings: Partial<AppSettings>) => Promise<AppSettings>;
+  onPluginsRefreshed: (callback: () => void) => () => void;
+  onAppSettingsUpdated: (callback: (settings: AppSettings) => void) => () => void;
 }
