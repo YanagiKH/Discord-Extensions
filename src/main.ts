@@ -170,9 +170,9 @@ if (!hasSingleInstance) {
     tray = null;
   });
 
-  app.on('window-all-closed', (event) => {
+  app.on('window-all-closed', () => {
     if (!isQuitting && appSettings.minimizeToTray) {
-      event.preventDefault();
+      app.quit();
     }
   });
 }
