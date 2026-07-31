@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Discord Extensions Companion",
+  "version": "0.1.0",
+  "description": "Companion extension for Discord web UI tuning and quick controls.",
+  "action": {
+    "default_title": "Discord Extensions",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://discord.com/*",
+        "https://*.discord.com/*"
+      ],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": [
+    "https://discord.com/*",
+    "https://*.discord.com/*"
+  ]
+}
