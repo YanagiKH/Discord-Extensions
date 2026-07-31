@@ -1,0 +1,20 @@
+name: Browser Extension
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate-browser-extension:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Validate browser extension layout
+        run: npm run validate:browser-extension
