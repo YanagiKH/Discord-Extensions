@@ -10,12 +10,22 @@ import type {
   PluginImportResult,
   PluginLanguage,
   PluginManifest,
+  PluginPermission,
   PluginRuntimeSpec,
   PluginSettingField,
-  PluginSource,
   PluginStoreRecord
 } from '../shared/types';
 import { ensureWorkspace, getPluginsRoot, openWorkspaceFolder, readPluginStore, writePluginStore } from './persistence';
+
+const ALLOWED_PERMISSIONS = new Set<PluginPermission>([
+  'voice-volume-read',
+  'voice-volume-normalize',
+  'tray-control',
+  'file-import',
+  'ui-panel',
+  'settings-persistence',
+  'auto-start'
+]);
 
 function cloneSetting(setting: PluginSettingField): PluginSettingField {
   return {
@@ -86,30 +96,37 @@ function normalizeBuild(value: unknown): PluginBuildSpec | undefined {
   };
 }
 
-function normalizeManifest(raw: unknown): PluginManifest {
-  if (typeof raw !== 'object' || raw === null) {
-    throw new Error('Manifest must be a JSON object.');
+function readStringField(record: Record<string, unknown>, key: string): string {
+  const value = record[key];
+  if (typeof value !== 'string' || value.trim().length === 0) {
+    throw new Error(`Manifest field "${key}" is required.`);
   }
+  return value.trim();
+}
 
-  const manifest = raw as Record<string, unknown>;
-  const requiredStrings = ['id', 'name', 'version', 'description', 'author', 'entry'] as const;
-  for (const key of requiredStrings) {
-    if (typeof manifest[key] !== 'string' || manifest[key].trim().length === 0) {
-      throw new Error(`Manifest field "${key}" is required.`);
-    }
-  }
-
-  if (!Array.isArray(manifest.permissions) || !Array.isArray(manifest.settings)) {
+function normalizePermissions(value: unknown): PluginPermission[] {
+  if (!Array.isArray(value)) {
     throw new Error('Manifest permissions and settings must be arrays.');
   }
 
-  const permissions = manifest.permissions.filter((value): value is string => typeof value === 'string');
-  const settings = manifest.settings.map((value) => {
-    if (typeof value !== 'object' || value === null) {
+  const permissions = value.filter((permission): permission is PluginPermission => {
+    return typeof permission === 'string' && ALLOWED_PERMISSIONS.has(permission as PluginPermission);
+  });
+
+  return permissions;
+}
+
+function normalizeSettings(value: unknown): PluginSettingField[] {
+  if (!Array.isArray(value)) {
+    throw new Error('Manifest permissions and settings must be arrays.');
+  }
+
+  return value.map((rawSetting) => {
+    if (typeof rawSetting !== 'object' || rawSetting === null) {
       throw new Error('Each setting must be an object.');
     }
 
-    const setting = value as Record<string, unknown>;
+    const setting = rawSetting as Record<string, unknown>;
     if (typeof setting.key !== 'string' || typeof setting.label !== 'string' || typeof setting.type !== 'string') {
       throw new Error('Setting entries require key, label, and type.');
     }
@@ -127,19 +144,27 @@ function normalizeManifest(raw: unknown): PluginManifest {
       step: typeof setting.step === 'number' ? setting.step : undefined
     } satisfies PluginSettingField;
   });
+}
+
+function normalizeManifest(raw: unknown): PluginManifest {
+  if (typeof raw !== 'object' || raw === null) {
+    throw new Error('Manifest must be a JSON object.');
+  }
+
+  const manifest = raw as Record<string, unknown>;
 
   return {
-    id: manifest.id.trim(),
-    name: manifest.name.trim(),
-    version: manifest.version.trim(),
-    description: manifest.description.trim(),
-    author: manifest.author.trim(),
+    id: readStringField(manifest, 'id'),
+    name: readStringField(manifest, 'name'),
+    version: readStringField(manifest, 'version'),
+    description: readStringField(manifest, 'description'),
+    author: readStringField(manifest, 'author'),
     category: ['audio', 'ui', 'automation', 'integration', 'utility'].includes(String(manifest.category))
       ? (String(manifest.category) as PluginManifest['category'])
       : 'utility',
-    entry: manifest.entry.trim(),
-    permissions,
-    settings,
+    entry: readStringField(manifest, 'entry'),
+    permissions: normalizePermissions(manifest.permissions),
+    settings: normalizeSettings(manifest.settings),
     hostKind: normalizeHostKind(manifest.hostKind),
     language: normalizeLanguage(manifest.language),
     runtime: normalizeRuntime(manifest.runtime),
@@ -210,13 +235,6 @@ function dedupePlugins(plugins: InstalledPlugin[]): InstalledPlugin[] {
     ordered.set(plugin.id, plugin);
   }
   return [...ordered.values()];
-}
-
-function withSource(plugin: InstalledPlugin, source: PluginSource): InstalledPlugin {
-  return {
-    ...plugin,
-    source
-  };
 }
 
 export class PluginManager {
