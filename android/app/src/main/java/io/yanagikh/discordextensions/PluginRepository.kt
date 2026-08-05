@@ -2,6 +2,7 @@ package io.yanagikh.discordextensions
 
 import android.content.Context
 import android.net.Uri
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
@@ -22,6 +23,7 @@ class PluginRepository(private val context: Context) {
 
     init {
         pluginsRoot.mkdirs()
+        ensureBuiltIns()
     }
 
     fun listPlugins(): List<PluginSummary> = pluginsRoot.listFiles()
@@ -99,6 +101,45 @@ class PluginRepository(private val context: Context) {
         } finally {
             staging.deleteRecursively()
         }
+    }
+
+    private fun ensureBuiltIns() {
+        writeBuiltIn(
+            id = "volume-lock",
+            name = "Volume Lock",
+            description = "Keeps configured voice levels inside a safer target range.",
+            settings = JSONArray()
+                .put(JSONObject().put("key", "targetVolume").put("label", "Target volume").put("type", "range").put("value", 70).put("min", 0).put("max", 100).put("step", 1))
+                .put(JSONObject().put("key", "autoNormalize").put("label", "Auto normalize").put("type", "toggle").put("value", true))
+        )
+        writeBuiltIn(
+            id = "focus-mode",
+            name = "Focus Mode",
+            description = "Stores reduced-distraction preferences for Discord-related sessions.",
+            settings = JSONArray()
+                .put(JSONObject().put("key", "muteNotifications").put("label", "Mute notifications").put("type", "toggle").put("value", true))
+                .put(JSONObject().put("key", "sessionLength").put("label", "Session length").put("type", "range").put("value", 45).put("min", 15).put("max", 240).put("step", 15))
+        )
+    }
+
+    private fun writeBuiltIn(id: String, name: String, description: String, settings: JSONArray) {
+        val directory = File(pluginsRoot, id)
+        val manifestFile = File(directory, "plugin.json")
+        if (manifestFile.isFile) return
+        directory.mkdirs()
+        val manifest = JSONObject()
+            .put("id", id)
+            .put("name", name)
+            .put("version", "1.0.0")
+            .put("description", description)
+            .put("author", "YanagiKH")
+            .put("category", "utility")
+            .put("entry", "builtin")
+            .put("permissions", JSONArray().put("ui-panel").put("settings-persistence"))
+            .put("settings", settings)
+            .put("hostKind", "panel")
+            .put("language", "kotlin")
+        manifestFile.writeText(manifest.toString(2), StandardCharsets.UTF_8)
     }
 
     private fun queryDisplayName(uri: Uri): String {
