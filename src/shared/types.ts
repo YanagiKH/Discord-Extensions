@@ -10,7 +10,16 @@ export type PluginPermission =
   | 'settings-persistence'
   | 'auto-start';
 export type PluginHostKind = 'panel' | 'tool';
-export type PluginLanguage = 'typescript' | 'javascript' | 'python' | 'go' | 'rust' | 'c' | 'cpp';
+export type PluginLanguage =
+  | 'typescript'
+  | 'javascript'
+  | 'python'
+  | 'go'
+  | 'rust'
+  | 'c'
+  | 'cpp'
+  | 'java'
+  | 'kotlin';
 
 export interface PluginSettingField {
   key: string;
@@ -73,4 +82,27 @@ export interface PluginImportFailure {
 export interface PluginImportResult {
   installed: InstalledPlugin[];
   failed: PluginImportFailure[];
+}
+
+export interface WorkbenchTemplate {
+  language: Extract<PluginLanguage, 'javascript' | 'typescript' | 'java' | 'kotlin'>;
+  label: string;
+  description: string;
+  entry: string;
+}
+
+export interface CreateWorkbenchModuleRequest {
+  id: string;
+  name: string;
+  author: string;
+  description: string;
+  category: PluginCategory;
+  language: WorkbenchTemplate['language'];
+}
+
+export interface WorkbenchModuleResult {
+  id: string;
+  modulePath: string;
+  manifestPath: string;
+  entryPath: string;
 }
