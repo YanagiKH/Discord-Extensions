@@ -1,7 +1,9 @@
 declare module 'adm-zip' {
   class AdmZip {
-    constructor(path: string);
+    constructor(path?: string);
     extractAllTo(targetPath: string, overwrite?: boolean): void;
+    addLocalFolder(localPath: string, zipPath?: string): void;
+    writeZip(targetPath: string): void;
   }
 
   export default AdmZip;
