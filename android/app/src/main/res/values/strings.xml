@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Discord Extensions</string>
+    <string name="android_subtitle">Android companion host and module workbench</string>
+    <string name="import_plugin">Import plugin</string>
+    <string name="open_workbench">Module workbench</string>
+    <string name="open_discord_web">Open Discord web</string>
+    <string name="refresh">Refresh</string>
+    <string name="debug_log">Debug log</string>
+    <string name="installed_plugins">Installed plugins</string>
+    <string name="no_plugins">No plugins are installed.</string>
+    <string name="enabled">Enabled</string>
+    <string name="disabled">Disabled</string>
+    <string name="import_complete">Plugin imported.</string>
+    <string name="import_failed">Plugin import failed: %1$s</string>
+    <string name="workbench_title">Extension module workbench</string>
+    <string name="module_id">Module ID</string>
+    <string name="module_name">Module name</string>
+    <string name="author">Author</string>
+    <string name="description">Description</string>
+    <string name="language">Language</string>
+    <string name="create_module">Create module</string>
+    <string name="export_module">Export module ZIP</string>
+    <string name="module_created">Module created in app-private mods storage.</string>
+    <string name="module_exported">Module package exported.</string>
+    <string name="invalid_module">Enter a valid module ID and name.</string>
+    <string name="back">Back</string>
+</resources>
