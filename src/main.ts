@@ -2,15 +2,36 @@ import { app, BrowserWindow, dialog, ipcMain, type IpcMainInvokeEvent, type Tray
 import path from 'node:path';
 import { defaultAppSettings, type AppSettings } from './shared/app-settings';
 import { IPC_CHANNELS } from './shared/ipc';
+import type { CreateWorkbenchModuleRequest } from './shared/types';
 import { createAppTray } from './main/tray';
 import { PluginManager } from './main/plugin-manager';
+import { WorkbenchManager } from './main/workbench-manager';
 import { readAppSettings, updateAppSettings } from './main/app-settings';
 
 let mainWindow: BrowserWindow | null = null;
+let workbenchWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let isQuitting = false;
 let appSettings: AppSettings = { ...defaultAppSettings };
 const pluginManager = new PluginManager();
+const workbenchManager = new WorkbenchManager();
+
+function sharedWebPreferences() {
+  return {
+    preload: path.join(__dirname, '../preload/index.js'),
+    contextIsolation: true,
+    nodeIntegration: false
+  };
+}
+
+function loadRendererPage(window: BrowserWindow, page: string) {
+  if (process.env.VITE_DEV_SERVER_URL) {
+    const suffix = page === 'index.html' ? '' : page;
+    void window.loadURL(`${process.env.VITE_DEV_SERVER_URL}${suffix}`);
+  } else {
+    void window.loadFile(path.join(__dirname, `../renderer/${page}`));
+  }
+}
 
 function createWindow() {
   if (mainWindow) {
@@ -24,18 +45,10 @@ function createWindow() {
     minHeight: 760,
     title: 'Discord Extensions',
     show: !appSettings.startHidden,
-    webPreferences: {
-      preload: path.join(__dirname, '../preload/index.js'),
-      contextIsolation: true,
-      nodeIntegration: false
-    }
+    webPreferences: sharedWebPreferences()
   });
 
-  if (process.env.VITE_DEV_SERVER_URL) {
-    void mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
-  } else {
-    void mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
-  }
+  loadRendererPage(mainWindow, 'index.html');
 
   mainWindow.on('closed', () => {
     mainWindow = null;
@@ -55,6 +68,29 @@ function createWindow() {
   }
 
   return mainWindow;
+}
+
+function createWorkbenchWindow() {
+  if (workbenchWindow && !workbenchWindow.isDestroyed()) {
+    workbenchWindow.show();
+    workbenchWindow.focus();
+    return workbenchWindow;
+  }
+
+  workbenchWindow = new BrowserWindow({
+    width: 980,
+    height: 780,
+    minWidth: 820,
+    minHeight: 680,
+    title: 'Discord Extensions Module Workbench',
+    parent: mainWindow ?? undefined,
+    webPreferences: sharedWebPreferences()
+  });
+  loadRendererPage(workbenchWindow, 'workbench.html');
+  workbenchWindow.on('closed', () => {
+    workbenchWindow = null;
+  });
+  return workbenchWindow;
 }
 
 function showWindow() {
@@ -122,6 +158,30 @@ function registerIpc() {
     broadcastAppSettings();
     return appSettings;
   });
+
+  ipcMain.handle(IPC_CHANNELS.openWorkbench, async () => {
+    createWorkbenchWindow();
+    return true;
+  });
+  ipcMain.handle(IPC_CHANNELS.listWorkbenchTemplates, () => workbenchManager.listTemplates());
+  ipcMain.handle(
+    IPC_CHANNELS.createWorkbenchModule,
+    async (_event: IpcMainInvokeEvent, request: CreateWorkbenchModuleRequest) => {
+      return workbenchManager.createModule(request);
+    }
+  );
+  ipcMain.handle(IPC_CHANNELS.exportWorkbenchModule, async (_event: IpcMainInvokeEvent, moduleId: string) => {
+    const result = await dialog.showSaveDialog(workbenchWindow ?? mainWindow ?? undefined, {
+      title: 'Export extension module',
+      defaultPath: `${moduleId}.zip`,
+      filters: [{ name: 'ZIP package', extensions: ['zip'] }]
+    });
+    if (result.canceled || !result.filePath) {
+      return null;
+    }
+    return workbenchManager.exportModule(moduleId, result.filePath);
+  });
+  ipcMain.handle(IPC_CHANNELS.openModsFolder, () => workbenchManager.openModsFolder());
 }
 
 async function startApplication() {
@@ -166,6 +226,8 @@ if (!hasSingleInstance) {
 
   app.on('before-quit', () => {
     isQuitting = true;
+    workbenchWindow?.destroy();
+    workbenchWindow = null;
     tray?.destroy();
     tray = null;
   });
