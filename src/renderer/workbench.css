@@ -1,0 +1,73 @@
+.workbench-shell {
+  width: min(920px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 24px 0;
+}
+
+.workbench-shell header {
+  margin-bottom: 18px;
+}
+
+.workbench-shell h1,
+.workbench-shell h2,
+.workbench-shell p {
+  margin-top: 0;
+}
+
+.workbench-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.workbench-form label {
+  display: grid;
+  gap: 6px;
+}
+
+.workbench-form label:has(textarea),
+.workbench-note,
+.workbench-actions {
+  grid-column: 1 / -1;
+}
+
+.workbench-form input,
+.workbench-form textarea,
+.workbench-form select {
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 10px;
+  background: #171b24;
+  color: inherit;
+  font: inherit;
+}
+
+.workbench-note {
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(88, 101, 242, 0.12);
+  color: #c8cdfd;
+}
+
+.workbench-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+#workbenchOutput {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  padding: 14px;
+  border-radius: 10px;
+  background: #0d0f14;
+  color: #cbd5e1;
+}
+
+@media (max-width: 720px) {
+  .workbench-form {
+    grid-template-columns: 1fr;
+  }
+}
