@@ -1,0 +1,13 @@
+{
+  "id": "javascript-module-template",
+  "name": "JavaScript Module Template",
+  "version": "1.0.0",
+  "description": "Starter JavaScript module for Discord Extensions.",
+  "author": "YanagiKH",
+  "category": "utility",
+  "entry": "src/index.js",
+  "permissions": ["ui-panel", "settings-persistence"],
+  "settings": [],
+  "hostKind": "tool",
+  "language": "javascript"
+}
