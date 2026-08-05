@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="720" viewBox="0 0 1000 720" role="img" aria-labelledby="title desc">
+  <title id="title">Discord Extensions Android companion preview</title>
+  <desc id="desc">A native Android companion interface showing import, module workbench, plugin switches, and debug logs.</desc>
+  <rect width="1000" height="720" rx="30" fill="#0f1219"/>
+  <rect x="324" y="22" width="352" height="676" rx="42" fill="#202633" stroke="#48516a" stroke-width="4"/>
+  <rect x="344" y="52" width="312" height="616" rx="28" fill="#11151d"/>
+  <rect x="444" y="35" width="112" height="10" rx="5" fill="#3c455a"/>
+  <text x="370" y="100" fill="#f5f7fb" font-family="Arial" font-size="25" font-weight="700">Discord Extensions</text>
+  <text x="370" y="126" fill="#9da8bd" font-family="Arial" font-size="13">Android companion host</text>
+  <rect x="368" y="154" width="126" height="45" rx="11" fill="#5865f2"/><text x="391" y="182" fill="white" font-family="Arial" font-size="14">Import plugin</text>
+  <rect x="506" y="154" width="126" height="45" rx="11" fill="#30384d"/><text x="520" y="182" fill="white" font-family="Arial" font-size="14">Module studio</text>
+  <text x="368" y="236" fill="#f5f7fb" font-family="Arial" font-size="18" font-weight="700">Installed plugins</text>
+  <rect x="368" y="252" width="264" height="74" rx="13" fill="#1c222f"/>
+  <text x="386" y="280" fill="#e9edf7" font-family="Arial" font-size="15">Volume Lock</text><text x="386" y="303" fill="#94a1b8" font-family="Arial" font-size="12">Safe target: 70%</text>
+  <rect x="574" y="272" width="42" height="24" rx="12" fill="#5865f2"/><circle cx="603" cy="284" r="9" fill="white"/>
+  <rect x="368" y="338" width="264" height="74" rx="13" fill="#1c222f"/>
+  <text x="386" y="366" fill="#e9edf7" font-family="Arial" font-size="15">Focus Mode</text><text x="386" y="389" fill="#94a1b8" font-family="Arial" font-size="12">Notifications reduced</text>
+  <rect x="574" y="358" width="42" height="24" rx="12" fill="#3b4458"/><circle cx="587" cy="370" r="9" fill="#c3cad7"/>
+  <text x="368" y="452" fill="#f5f7fb" font-family="Arial" font-size="18" font-weight="700">Debug log</text>
+  <rect x="368" y="468" width="264" height="150" rx="13" fill="#0b0e14"/>
+  <g fill="#9cd3ad" font-family="monospace" font-size="11">
+    <text x="383" y="492">17:04 Android host started</text>
+    <text x="383" y="514">17:05 Imported plugin volume-lock</text>
+    <text x="383" y="536">17:05 Plugin volume-lock enabled=true</text>
+    <text x="383" y="558">17:06 Created module quick-tools</text>
+  </g>
+  <text x="24" y="706" fill="#77829b" font-family="Arial" font-size="13">Interface preview — generated documentation artwork, not a runtime screenshot.</text>
+</svg>
