@@ -1,0 +1,37 @@
+appId: io.yanagikh.discordextensions
+productName: Discord Extensions
+artifactName: Discord-Extensions-${version}-${os}-${arch}.${ext}
+directories:
+  output: release/desktop
+files:
+  - dist/**/*
+  - package.json
+  - plugins/**/*
+  - mods/**/*
+  - browser-extension/**/*
+extraMetadata:
+  main: dist/main/index.js
+asar: true
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+mac:
+  target:
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+  category: public.app-category.utilities
+linux:
+  target:
+    - target: AppImage
+      arch:
+        - x64
+  category: Utility
