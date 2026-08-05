@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520" role="img" aria-labelledby="title desc">
+  <title id="title">Discord Extensions release pipeline</title>
+  <desc id="desc">Source validation branches into Windows, macOS, Linux, Android, and Chromium packages, which are published to GitHub Releases.</desc>
+  <rect width="1200" height="520" rx="28" fill="#10131a"/>
+  <text x="54" y="62" fill="#f4f6fb" font-family="Arial" font-size="28" font-weight="700">Cross-platform Release Pipeline</text>
+  <rect x="54" y="106" width="220" height="86" rx="16" fill="#20283a" stroke="#4c5a78"/>
+  <text x="89" y="142" fill="#f4f6fb" font-family="Arial" font-size="18" font-weight="700">Source + tests</text>
+  <text x="78" y="169" fill="#a9b4c9" font-family="Arial" font-size="13">TypeScript · Android · browser · mods</text>
+  <path d="M274 149 H350" stroke="#64748b" stroke-width="4"/>
+  <polygon points="350,149 336,141 336,157" fill="#64748b"/>
+  <rect x="350" y="80" width="260" height="138" rx="18" fill="#171c27" stroke="#5865f2"/>
+  <text x="390" y="116" fill="#f4f6fb" font-family="Arial" font-size="18" font-weight="700">GitHub Actions validation</text>
+  <g fill="#a9b4c9" font-family="Arial" font-size="14">
+    <text x="390" y="146">• Typecheck and desktop build</text><text x="390" y="170">• Android unit + emulator tests</text>
+    <text x="390" y="194">• Browser and workbench validation</text>
+  </g>
+  <path d="M610 149 H686" stroke="#64748b" stroke-width="4"/><polygon points="686,149 672,141 672,157" fill="#64748b"/>
+  <g font-family="Arial">
+    <rect x="686" y="50" width="180" height="74" rx="14" fill="#1c2432"/><text x="727" y="82" fill="#f4f6fb" font-size="16" font-weight="700">Windows</text><text x="746" y="105" fill="#9fb1cc" font-size="13">NSIS .exe</text>
+    <rect x="886" y="50" width="180" height="74" rx="14" fill="#1c2432"/><text x="941" y="82" fill="#f4f6fb" font-size="16" font-weight="700">macOS</text><text x="949" y="105" fill="#9fb1cc" font-size="13">.dmg</text>
+    <rect x="686" y="140" width="180" height="74" rx="14" fill="#1c2432"/><text x="744" y="172" fill="#f4f6fb" font-size="16" font-weight="700">Linux</text><text x="730" y="195" fill="#9fb1cc" font-size="13">.AppImage</text>
+    <rect x="886" y="140" width="180" height="74" rx="14" fill="#1c2432"/><text x="937" y="172" fill="#f4f6fb" font-size="16" font-weight="700">Android</text><text x="955" y="195" fill="#9fb1cc" font-size="13">.apk</text>
+    <rect x="786" y="230" width="180" height="74" rx="14" fill="#1c2432"/><text x="835" y="262" fill="#f4f6fb" font-size="16" font-weight="700">Chromium</text><text x="855" y="285" fill="#9fb1cc" font-size="13">.zip</text>
+  </g>
+  <path d="M876 310 V364" stroke="#64748b" stroke-width="4"/><polygon points="876,364 868,350 884,350" fill="#64748b"/>
+  <rect x="720" y="364" width="312" height="98" rx="18" fill="#5865f2"/>
+  <text x="785" y="404" fill="white" font-family="Arial" font-size="22" font-weight="700">GitHub Releases</text>
+  <text x="756" y="435" fill="#e7e9ff" font-family="Arial" font-size="14">Installable artifacts and generated release notes</text>
+  <text x="24" y="506" fill="#77829b" font-family="Arial" font-size="13">Documentation diagram.</text>
+</svg>
