@@ -1,0 +1,18 @@
+{
+  "id": "java-module-template",
+  "name": "Java Module Template",
+  "version": "1.0.0",
+  "description": "Starter Java 17 module for Discord Extensions.",
+  "author": "YanagiKH",
+  "category": "utility",
+  "entry": "src/main/java/module/ExtensionModule.java",
+  "permissions": ["ui-panel", "settings-persistence"],
+  "settings": [],
+  "hostKind": "tool",
+  "language": "java",
+  "build": {
+    "command": "gradle",
+    "args": ["build"],
+    "output": "build/libs"
+  }
+}
