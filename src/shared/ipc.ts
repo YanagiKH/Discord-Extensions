@@ -1,5 +1,11 @@
 import type { AppSettings } from './app-settings';
-import type { InstalledPlugin, PluginImportResult } from './types';
+import type {
+  CreateWorkbenchModuleRequest,
+  InstalledPlugin,
+  PluginImportResult,
+  WorkbenchModuleResult,
+  WorkbenchTemplate
+} from './types';
 
 export const IPC_CHANNELS = {
   listPlugins: 'plugins:list',
@@ -11,6 +17,11 @@ export const IPC_CHANNELS = {
   setAutoStart: 'app:set-autostart',
   getAppSettings: 'app:get-settings',
   updateAppSettings: 'app:update-settings',
+  openWorkbench: 'workbench:open',
+  listWorkbenchTemplates: 'workbench:templates',
+  createWorkbenchModule: 'workbench:create',
+  exportWorkbenchModule: 'workbench:export',
+  openModsFolder: 'workbench:open-mods',
   pluginsRefreshed: 'plugins:refreshed',
   appSettingsUpdated: 'app:settings-updated'
 } as const;
@@ -29,6 +40,11 @@ export interface DiscordExtensionsApi {
   setAutoStart: (enabled: boolean) => Promise<boolean>;
   getAppSettings: () => Promise<AppSettings>;
   updateAppSettings: (settings: Partial<AppSettings>) => Promise<AppSettings>;
+  openWorkbench: () => Promise<boolean>;
+  listWorkbenchTemplates: () => Promise<WorkbenchTemplate[]>;
+  createWorkbenchModule: (request: CreateWorkbenchModuleRequest) => Promise<WorkbenchModuleResult>;
+  exportWorkbenchModule: (moduleId: string) => Promise<string | null>;
+  openModsFolder: () => Promise<string>;
   onPluginsRefreshed: (callback: () => void) => () => void;
   onAppSettingsUpdated: (callback: (settings: AppSettings) => void) => () => void;
 }
