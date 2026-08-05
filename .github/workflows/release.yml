@@ -1,0 +1,140 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag
+        required: true
+        default: v0.2.0
+
+permissions:
+  contents: write
+
+jobs:
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            command: npm run dist:win
+            artifact: desktop-windows
+          - os: macos-latest
+            command: npm run dist:mac
+            artifact: desktop-macos
+          - os: ubuntu-latest
+            command: npm run dist:linux
+            artifact: desktop-linux
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Validate desktop sources
+        run: |
+          npm run typecheck
+          npm run validate:repo
+          npm run validate:workbench
+
+      - name: Build desktop installer
+        shell: bash
+        run: ${{ matrix.command }}
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+
+      - name: Upload desktop installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: release/desktop/**
+          if-no-files-found: error
+
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'platform-tools'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+
+      - name: Test and build installable debug APK
+        run: gradle -p android clean testDebugUnitTest assembleDebug --stacktrace
+
+      - name: Rename APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk Discord-Extensions-Android-${{ github.ref_name || inputs.tag }}.apk
+
+      - name: Upload Android installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: Discord-Extensions-Android-*.apk
+
+  browser-extension:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Validate browser extension
+        run: npm run validate:browser-extension
+
+      - name: Package browser extension
+        run: zip -r Discord-Extensions-Chromium.zip browser-extension
+
+      - name: Upload browser extension package
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-extension
+          path: Discord-Extensions-Chromium.zip
+
+  publish:
+    needs: [desktop, android, browser-extension]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download release assets
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+          name: Discord Extensions ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+          generate_release_notes: true
+          files: release-assets/**/*
+          fail_on_unmatched_files: true
