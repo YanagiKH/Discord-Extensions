@@ -1,0 +1,18 @@
+{
+  "id": "kotlin-module-template",
+  "name": "Kotlin Module Template",
+  "version": "1.0.0",
+  "description": "Starter Kotlin/JVM module for Discord Extensions.",
+  "author": "YanagiKH",
+  "category": "utility",
+  "entry": "src/main/kotlin/module/ExtensionModule.kt",
+  "permissions": ["ui-panel", "settings-persistence"],
+  "settings": [],
+  "hostKind": "tool",
+  "language": "kotlin",
+  "build": {
+    "command": "gradle",
+    "args": ["build"],
+    "output": "build/libs"
+  }
+}
