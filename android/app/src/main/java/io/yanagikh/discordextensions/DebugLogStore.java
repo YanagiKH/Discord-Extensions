@@ -2,11 +2,12 @@ package io.yanagikh.discordextensions;
 
 import android.content.Context;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.time.Instant;
 
 public final class DebugLogStore {
@@ -28,8 +29,14 @@ public final class DebugLogStore {
         if (!logFile.isFile()) {
             return "";
         }
-        try {
-            return Files.readString(logFile.toPath(), StandardCharsets.UTF_8);
+        try (FileInputStream input = new FileInputStream(logFile);
+             ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            byte[] buffer = new byte[4096];
+            int read;
+            while ((read = input.read(buffer)) >= 0) {
+                output.write(buffer, 0, read);
+            }
+            return output.toString(StandardCharsets.UTF_8.name());
         } catch (IOException exception) {
             return exception.getMessage() == null ? "Unable to read debug log." : exception.getMessage();
         }
