@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Discord Extensions</string>
+    <string name="android_subtitle">Android コンパニオンホストとモジュールワークベンチ</string>
+    <string name="import_plugin">プラグインを読み込む</string>
+    <string name="open_workbench">モジュールワークベンチ</string>
+    <string name="open_discord_web">Discord Web を開く</string>
+    <string name="refresh">更新</string>
+    <string name="debug_log">デバッグログ</string>
+    <string name="installed_plugins">インストール済みプラグイン</string>
+    <string name="no_plugins">プラグインはインストールされていません。</string>
+    <string name="enabled">有効</string>
+    <string name="disabled">無効</string>
+    <string name="import_complete">プラグインを読み込みました。</string>
+    <string name="import_failed">プラグインの読み込みに失敗しました: %1$s</string>
+    <string name="workbench_title">拡張機能モジュールワークベンチ</string>
+    <string name="module_id">モジュール ID</string>
+    <string name="module_name">モジュール名</string>
+    <string name="author">作成者</string>
+    <string name="description">説明</string>
+    <string name="language">言語</string>
+    <string name="create_module">モジュールを作成</string>
+    <string name="export_module">モジュール ZIP を書き出す</string>
+    <string name="module_created">モジュールをアプリ専用の mods ストレージに作成しました。</string>
+    <string name="module_exported">モジュールパッケージを書き出しました。</string>
+    <string name="invalid_module">有効なモジュール ID と名前を入力してください。</string>
+    <string name="back">戻る</string>
+</resources>
