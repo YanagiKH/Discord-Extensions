@@ -3,6 +3,8 @@
   "version": "0.2.0",
   "private": true,
   "description": "Discord Extensions cross-platform companion app and plugin host",
+  "author": "YanagiKH",
+  "license": "MIT",
   "main": "dist/main/index.js",
   "scripts": {
     "dev": "electron-vite dev",
@@ -21,11 +23,11 @@
     "dist:linux": "npm run build && npx --yes electron-builder@26.0.12 --linux AppImage --x64 --publish never"
   },
   "dependencies": {
-    "adm-zip": "^0.5.16",
-    "electron": "^32.0.0"
+    "adm-zip": "^0.5.16"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
+    "electron": "^32.0.0",
     "electron-vite": "^2.3.0",
     "typescript": "^5.8.2"
   }
