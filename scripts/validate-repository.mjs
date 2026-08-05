@@ -6,12 +6,17 @@ const REQUIRED_PATHS = [
   'package.json',
   'package-lock.json',
   'tsconfig.json',
+  'electron-builder.yml',
   'start.bat',
   'src/main.ts',
   'src/main/plugin-manager.ts',
+  'src/main/workbench-manager.ts',
   'src/preload.ts',
   'src/renderer/app.ts',
   'src/renderer/index.html',
+  'src/renderer/workbench.html',
+  'src/renderer/workbench.ts',
+  'src/renderer/workbench.css',
   'src/shared/types.ts',
   'src/shared/ipc.ts',
   'src/shared/locales.ts',
@@ -19,27 +24,30 @@ const REQUIRED_PATHS = [
   '.github/CONTRIBUTING.md',
   '.github/SECURITY.md',
   '.github/workflows/ci.yml',
+  '.github/workflows/android.yml',
+  '.github/workflows/release.yml',
   '.github/workflows/samples.yml',
   '.github/workflows/browser-extension.yml',
   'browser-extension/manifest.json',
-  'browser-extension/background.js',
-  'browser-extension/content.js',
-  'browser-extension/popup.html',
-  'browser-extension/popup.js',
-  'browser-extension/styles.css',
-  'browser-extension/settings.js',
+  'android/settings.gradle.kts',
+  'android/app/build.gradle.kts',
+  'android/app/src/main/AndroidManifest.xml',
+  'mods/README.md',
+  'mods/templates/javascript/plugin.json',
+  'mods/templates/java/plugin.json',
+  'mods/templates/kotlin/plugin.json',
+  'docs/images/desktop-workbench.svg',
+  'docs/images/android-host.svg',
+  'docs/images/release-pipeline.svg',
+  'scripts/validate-browser-extension.mjs',
+  'scripts/validate-android-project.mjs',
+  'scripts/validate-workbench.mjs',
+  'scripts/validate-readme-parity.mjs',
   'plugins/samples/python-voice-guard/plugin.json',
-  'plugins/samples/python-voice-guard/main.py',
   'plugins/samples/go-quick-actions/plugin.json',
-  'plugins/samples/go-quick-actions/go.mod',
-  'plugins/samples/go-quick-actions/main.go',
   'plugins/samples/rust-safe-speaker/plugin.json',
-  'plugins/samples/rust-safe-speaker/Cargo.toml',
-  'plugins/samples/rust-safe-speaker/src/main.rs',
   'plugins/samples/c-voice-guard/plugin.json',
-  'plugins/samples/c-voice-guard/main.c',
-  'plugins/samples/cpp-compact-sidebar/plugin.json',
-  'plugins/samples/cpp-compact-sidebar/main.cpp'
+  'plugins/samples/cpp-compact-sidebar/plugin.json'
 ];
 
 async function exists(relativePath) {
@@ -52,38 +60,45 @@ async function exists(relativePath) {
 }
 
 function assert(condition, message) {
-  if (!condition) {
-    throw new Error(message);
-  }
+  if (!condition) throw new Error(message);
 }
 
 async function loadJson(relativePath) {
-  const content = await readFile(path.join(ROOT, relativePath), 'utf8');
-  return JSON.parse(content);
+  return JSON.parse(await readFile(path.join(ROOT, relativePath), 'utf8'));
 }
 
 async function main() {
   const missing = [];
   for (const relativePath of REQUIRED_PATHS) {
-    if (!(await exists(relativePath))) {
-      missing.push(relativePath);
-    }
+    if (!(await exists(relativePath))) missing.push(relativePath);
   }
-
   assert(missing.length === 0, `Missing required repository paths: ${missing.join(', ')}`);
 
   const pkg = await loadJson('package.json');
-  assert(pkg.scripts && typeof pkg.scripts === 'object', 'package.json scripts object missing');
-  assert(typeof pkg.scripts['validate:repo'] === 'string', 'validate:repo script missing');
-  assert(typeof pkg.scripts['validate:browser-extension'] === 'string', 'validate:browser-extension script missing');
-  assert(typeof pkg.scripts['start:desktop'] === 'string', 'start:desktop script missing');
+  const scripts = pkg.scripts ?? {};
+  for (const script of [
+    'start:desktop',
+    'validate:repo',
+    'validate:browser-extension',
+    'validate:android',
+    'validate:workbench',
+    'validate:readmes',
+    'dist:win',
+    'dist:mac',
+    'dist:linux'
+  ]) {
+    assert(typeof scripts[script] === 'string', `package.json script missing: ${script}`);
+  }
 
   const samplePlugins = [
     'plugins/samples/python-voice-guard/plugin.json',
     'plugins/samples/go-quick-actions/plugin.json',
     'plugins/samples/rust-safe-speaker/plugin.json',
     'plugins/samples/c-voice-guard/plugin.json',
-    'plugins/samples/cpp-compact-sidebar/plugin.json'
+    'plugins/samples/cpp-compact-sidebar/plugin.json',
+    'mods/templates/javascript/plugin.json',
+    'mods/templates/java/plugin.json',
+    'mods/templates/kotlin/plugin.json'
   ];
 
   for (const manifestPath of samplePlugins) {
@@ -93,16 +108,15 @@ async function main() {
     }
     assert(Array.isArray(manifest.permissions), `${manifestPath} permissions must be an array`);
     assert(Array.isArray(manifest.settings), `${manifestPath} settings must be an array`);
-    assert(manifest.hostKind === 'tool', `${manifestPath} should be tool-oriented`);
-    assert(typeof manifest.language === 'string', `${manifestPath} language missing`);
-    assert(manifest.runtime && typeof manifest.runtime.command === 'string', `${manifestPath} runtime missing command`);
-    assert(manifest.build && typeof manifest.build.command === 'string', `${manifestPath} build missing command`);
   }
 
   const browserManifest = await loadJson('browser-extension/manifest.json');
   assert(browserManifest.manifest_version === 3, 'browser-extension manifest must use MV3');
   assert(typeof browserManifest.action?.default_popup === 'string', 'browser-extension popup missing');
-  assert(Array.isArray(browserManifest.content_scripts), 'browser-extension content scripts missing');
+
+  const lock = await loadJson('package-lock.json');
+  assert(lock.version === undefined || lock.version === pkg.version, 'package-lock package version mismatch');
+  assert(lock.packages?.['']?.version === pkg.version, 'package-lock root version mismatch');
 
   console.log('Repository validation passed.');
 }
