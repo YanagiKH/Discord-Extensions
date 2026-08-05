@@ -14,6 +14,7 @@
     "validate:browser-extension": "node scripts/validate-browser-extension.mjs",
     "validate:android": "node scripts/validate-android-project.mjs",
     "validate:workbench": "node scripts/validate-workbench.mjs",
+    "validate:readmes": "node scripts/validate-readme-parity.mjs",
     "dist": "npx --yes electron-builder@26.0.12 --publish never",
     "dist:win": "npm run build && npx --yes electron-builder@26.0.12 --win nsis --x64 --publish never",
     "dist:mac": "npm run build && npx --yes electron-builder@26.0.12 --mac dmg --x64 --arm64 --publish never",
