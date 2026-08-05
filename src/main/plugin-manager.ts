@@ -68,7 +68,17 @@ function normalizeHostKind(value: unknown): PluginHostKind {
 }
 
 function normalizeLanguage(value: unknown): PluginLanguage {
-  const allowed: PluginLanguage[] = ['typescript', 'javascript', 'python', 'go', 'rust', 'c', 'cpp'];
+  const allowed: PluginLanguage[] = [
+    'typescript',
+    'javascript',
+    'python',
+    'go',
+    'rust',
+    'c',
+    'cpp',
+    'java',
+    'kotlin'
+  ];
   return allowed.includes(value as PluginLanguage) ? (value as PluginLanguage) : 'typescript';
 }
 
@@ -109,11 +119,9 @@ function normalizePermissions(value: unknown): PluginPermission[] {
     throw new Error('Manifest permissions and settings must be arrays.');
   }
 
-  const permissions = value.filter((permission): permission is PluginPermission => {
+  return value.filter((permission): permission is PluginPermission => {
     return typeof permission === 'string' && ALLOWED_PERMISSIONS.has(permission as PluginPermission);
   });
-
-  return permissions;
 }
 
 function normalizeSettings(value: unknown): PluginSettingField[] {
@@ -218,7 +226,10 @@ function applyStore(plugin: InstalledPlugin, store: Record<string, PluginStoreRe
   return {
     ...clonePlugin(plugin),
     state: record ? (record.enabled ? 'enabled' : 'disabled') : plugin.state,
-    settings: plugin.settings.map((setting) => ({ ...cloneSetting(setting), value: settingsByKey.get(setting.key) ?? setting.value }))
+    settings: plugin.settings.map((setting) => ({
+      ...cloneSetting(setting),
+      value: settingsByKey.get(setting.key) ?? setting.value
+    }))
   };
 }
 
@@ -310,10 +321,7 @@ export class PluginManager {
     }
 
     await this.refresh();
-    return {
-      installed,
-      failed
-    };
+    return { installed, failed };
   }
 
   public async openDataFolder(): Promise<string> {
@@ -334,7 +342,7 @@ export class PluginManager {
     const discovered: InstalledPlugin[] = [];
 
     for (const entry of entries) {
-      if (!entry.isDirectory()) {
+      if (!entry.isDirectory() || entry.name.startsWith('.')) {
         continue;
       }
 
@@ -342,16 +350,15 @@ export class PluginManager {
       try {
         const manifestPath = await locateManifestFile(installPath);
         const manifest = normalizeManifest(JSON.parse(await fs.readFile(manifestPath, 'utf8')));
-        const relativeManifestPath = path.relative(installPath, manifestPath);
         discovered.push({
           ...manifest,
           state: 'disabled',
           installPath,
-          manifestPath: relativeManifestPath,
+          manifestPath: path.relative(installPath, manifestPath),
           source: 'local-import'
         });
       } catch {
-        // Skip malformed folders.
+        // Malformed folders are ignored and remain available for manual repair.
       }
     }
 
@@ -368,7 +375,6 @@ export class PluginManager {
     if (lower.endsWith('.zip')) {
       return this.importArchive(sourcePath);
     }
-
     if (lower.endsWith('.json')) {
       return this.importManifestFile(sourcePath);
     }
@@ -384,31 +390,39 @@ export class PluginManager {
     await fs.rm(targetRoot, { recursive: true, force: true });
     await fs.cp(sourcePath, targetRoot, { recursive: true });
 
-    const plugin = this.createImportedPlugin(manifest, targetRoot, path.relative(targetRoot, path.join(targetRoot, path.relative(sourcePath, manifestPath))));
+    const relativeManifest = path.relative(sourcePath, manifestPath);
+    const plugin = this.createImportedPlugin(manifest, targetRoot, relativeManifest);
     await this.persist(plugin);
     return plugin;
   }
 
   private async importArchive(sourcePath: string): Promise<InstalledPlugin> {
-    const stagingRoot = path.join(getPluginsRoot(), '.staging', `${Date.now()}-${sanitizeFolderName(path.basename(sourcePath, '.zip'))}`);
+    const stagingRoot = path.join(
+      getPluginsRoot(),
+      '.staging',
+      `${Date.now()}-${sanitizeFolderName(path.basename(sourcePath, '.zip'))}`
+    );
     await fs.rm(stagingRoot, { recursive: true, force: true });
     await fs.mkdir(stagingRoot, { recursive: true });
 
-    const archive = new AdmZip(sourcePath);
-    archive.extractAllTo(stagingRoot, true);
+    try {
+      const archive = new AdmZip(sourcePath);
+      archive.extractAllTo(stagingRoot, true);
 
-    const manifestPath = await locateManifestFile(stagingRoot);
-    const manifest = normalizeManifest(JSON.parse(await fs.readFile(manifestPath, 'utf8')));
-    const targetRoot = path.join(getPluginsRoot(), sanitizeFolderName(manifest.id));
-    const relativeManifestPath = path.relative(stagingRoot, manifestPath);
+      const manifestPath = await locateManifestFile(stagingRoot);
+      const manifest = normalizeManifest(JSON.parse(await fs.readFile(manifestPath, 'utf8')));
+      const targetRoot = path.join(getPluginsRoot(), sanitizeFolderName(manifest.id));
+      const relativeManifestPath = path.relative(stagingRoot, manifestPath);
 
-    await fs.rm(targetRoot, { recursive: true, force: true });
-    await fs.cp(stagingRoot, targetRoot, { recursive: true });
-    await fs.rm(stagingRoot, { recursive: true, force: true });
+      await fs.rm(targetRoot, { recursive: true, force: true });
+      await fs.cp(stagingRoot, targetRoot, { recursive: true });
 
-    const plugin = this.createImportedPlugin(manifest, targetRoot, relativeManifestPath);
-    await this.persist(plugin);
-    return plugin;
+      const plugin = this.createImportedPlugin(manifest, targetRoot, relativeManifestPath);
+      await this.persist(plugin);
+      return plugin;
+    } finally {
+      await fs.rm(stagingRoot, { recursive: true, force: true });
+    }
   }
 
   private async importManifestFile(sourcePath: string): Promise<InstalledPlugin> {
