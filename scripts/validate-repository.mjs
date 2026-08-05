@@ -43,6 +43,7 @@ const REQUIRED_PATHS = [
   'docs/images/desktop-workbench.svg',
   'docs/images/android-host.svg',
   'docs/images/release-pipeline.svg',
+  'scripts/collect-release-assets.mjs',
   'scripts/validate-browser-extension.mjs',
   'scripts/validate-android-project.mjs',
   'scripts/validate-workbench.mjs',
@@ -93,6 +94,7 @@ async function main() {
   ]) {
     assert(typeof scripts[script] === 'string', `package.json script missing: ${script}`);
   }
+  assert(pkg.devDependencies?.['electron-builder'] === '26.0.12', 'electron-builder must be pinned to 26.0.12');
 
   const samplePlugins = [
     'plugins/samples/python-voice-guard/plugin.json',
@@ -121,6 +123,11 @@ async function main() {
   const lock = await loadJson('package-lock.json');
   assert(lock.version === undefined || lock.version === pkg.version, 'package-lock package version mismatch');
   assert(lock.packages?.['']?.version === pkg.version, 'package-lock root version mismatch');
+  assert(lock.packages?.['']?.devDependencies?.['electron-builder'] === '26.0.12', 'package-lock electron-builder metadata mismatch');
+
+  const releaseWorkflow = await readFile(path.join(ROOT, '.github/workflows/release.yml'), 'utf8');
+  assert(releaseWorkflow.includes('staged-release-assets/*'), 'release workflow must upload staged assets only');
+  assert(!releaseWorkflow.includes('release/desktop/**'), 'release workflow must not upload unpacked desktop directories');
 
   console.log('Repository validation passed.');
 }

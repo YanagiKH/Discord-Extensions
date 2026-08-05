@@ -4,6 +4,19 @@ on:
   push:
     tags:
       - 'v*'
+  pull_request:
+    paths:
+      - '.github/workflows/release.yml'
+      - 'electron-builder.yml'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'src/**'
+      - 'plugins/**'
+      - 'mods/**'
+      - 'browser-extension/**'
+      - 'android/**'
+      - 'scripts/collect-release-assets.mjs'
+      - 'scripts/validate-*.mjs'
   workflow_dispatch:
     inputs:
       tag:
@@ -14,102 +27,178 @@ on:
 permissions:
   contents: write
 
-env:
-  RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
-
 jobs:
   desktop:
+    name: Desktop (${{ matrix.platform }})
     strategy:
       fail-fast: false
       matrix:
         include:
-          - os: windows-latest
+          - platform: windows
+            os: windows-latest
             command: npm run dist:win
-            artifact: desktop-windows
-          - os: macos-latest
+          - platform: macos
+            os: macos-latest
             command: npm run dist:mac
-            artifact: desktop-macos
-          - os: ubuntu-latest
+          - platform: linux
+            os: ubuntu-latest
             command: npm run dist:linux
-            artifact: desktop-linux
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: '24'
-          cache: npm
-      - run: npm install
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
       - name: Validate desktop sources
         run: |
           npm run typecheck
           npm run validate:repo
           npm run validate:workbench
           npm run validate:readmes
+
       - name: Build desktop installer
         shell: bash
         run: ${{ matrix.command }}
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
-      - uses: actions/upload-artifact@v4
+
+      - name: Collect installable desktop assets
+        run: node scripts/collect-release-assets.mjs desktop ${{ matrix.platform }}
+
+      - name: Upload desktop installer
+        uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.artifact }}
-          path: release/desktop/**
+          name: desktop-${{ matrix.platform }}
+          path: staged-release-assets/*
           if-no-files-found: error
+          retention-days: 7
 
   android:
+    name: Android APK
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-      - uses: android-actions/setup-android@v3
-      - run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'platform-tools'
-      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'platform-tools'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.10.2'
-      - name: Test and build installable debug APK
+
+      - name: Test and build installable APK
         run: gradle -p android clean testDebugUnitTest assembleDebug --stacktrace
-      - name: Rename APK
-        run: cp android/app/build/outputs/apk/debug/app-debug.apk "Discord-Extensions-Android-${RELEASE_TAG}.apk"
-      - uses: actions/upload-artifact@v4
+
+      - name: Collect Android asset
+        run: node scripts/collect-release-assets.mjs android
+
+      - name: Upload Android installer
+        uses: actions/upload-artifact@v4
         with:
           name: android-apk
-          path: Discord-Extensions-Android-*.apk
+          path: staged-release-assets/*
+          if-no-files-found: error
+          retention-days: 7
 
   browser-extension:
+    name: Chromium extension
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: '24'
-      - run: npm run validate:browser-extension
-      - run: zip -r Discord-Extensions-Chromium.zip browser-extension
-      - uses: actions/upload-artifact@v4
+          node-version: '22'
+
+      - name: Validate browser extension
+        run: npm run validate:browser-extension
+
+      - name: Package browser extension
+        run: node scripts/collect-release-assets.mjs browser
+
+      - name: Upload browser extension
+        uses: actions/upload-artifact@v4
         with:
           name: browser-extension
-          path: Discord-Extensions-Chromium.zip
+          path: staged-release-assets/*
+          if-no-files-found: error
+          retention-days: 7
+
+  verify:
+    name: Release verification
+    if: always()
+    needs: [desktop, android, browser-extension]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every package job to pass
+        env:
+          DESKTOP_RESULT: ${{ needs.desktop.result }}
+          ANDROID_RESULT: ${{ needs.android.result }}
+          BROWSER_RESULT: ${{ needs.browser-extension.result }}
+        run: |
+          printf 'desktop=%s\nandroid=%s\nbrowser=%s\n' "$DESKTOP_RESULT" "$ANDROID_RESULT" "$BROWSER_RESULT"
+          test "$DESKTOP_RESULT" = success
+          test "$ANDROID_RESULT" = success
+          test "$BROWSER_RESULT" = success
 
   publish:
-    needs: [desktop, android, browser-extension]
+    name: Publish GitHub Release
+    if: github.event_name != 'pull_request' && needs.verify.result == 'success'
+    needs: [desktop, android, browser-extension, verify]
     runs-on: ubuntu-latest
     steps:
       - name: Download release assets
         uses: actions/download-artifact@v4
         with:
-          path: release-assets
-          merge-multiple: true
-      - name: Generate SHA-256 checksums
+          path: downloaded-assets
+
+      - name: Prepare unique release assets and checksums
+        shell: bash
         run: |
-          find release-assets -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > release-assets/SHA256SUMS.txt
+          mkdir -p publish-assets
+          find downloaded-assets -type f \( \
+            -name '*.exe' -o \
+            -name '*.dmg' -o \
+            -name '*.AppImage' -o \
+            -name '*.apk' -o \
+            -name '*.zip' \
+          \) -print0 | while IFS= read -r -d '' file; do
+            name="$(basename "$file")"
+            if [ -e "publish-assets/$name" ]; then
+              echo "Duplicate release asset name: $name" >&2
+              exit 1
+            fi
+            cp "$file" "publish-assets/$name"
+          done
+          test "$(find publish-assets -maxdepth 1 -type f | wc -l)" -ge 6
+          (cd publish-assets && sha256sum * > SHA256SUMS.txt)
+          ls -la publish-assets
+
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.RELEASE_TAG }}
-          name: Discord Extensions ${{ env.RELEASE_TAG }}
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+          name: Discord Extensions ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
           generate_release_notes: true
-          files: release-assets/**/*
+          files: publish-assets/*
           fail_on_unmatched_files: true
