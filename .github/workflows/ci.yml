@@ -38,37 +38,29 @@ jobs:
       - name: Validate Android project layout
         run: npm run validate:android
 
+      - name: Validate multilingual README parity
+        run: npm run validate:readmes
+
   validate-android-build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup Java 17
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install Android SDK packages
-        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'platform-tools'
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+      - uses: android-actions/setup-android@v3
+      - run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'platform-tools'
+      - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.10.2'
-
-      - name: Android unit tests and APK build
-        run: gradle -p android testDebugUnitTest assembleDebug --stacktrace
+      - run: gradle -p android testDebugUnitTest assembleDebug --stacktrace
 
   validate-python-sample:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -77,8 +69,7 @@ jobs:
   validate-go-sample:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
           go-version: '1.23'
@@ -88,8 +79,7 @@ jobs:
   validate-rust-sample:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - working-directory: plugins/samples/rust-safe-speaker
         run: cargo check
@@ -97,8 +87,7 @@ jobs:
   validate-c-sample:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       - run: sudo apt-get update && sudo apt-get install -y build-essential
       - working-directory: plugins/samples/c-voice-guard
         run: gcc -std=c11 -Wall -Wextra -Werror main.c -o c-voice-guard
@@ -106,8 +95,7 @@ jobs:
   validate-cpp-sample:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       - run: sudo apt-get update && sudo apt-get install -y build-essential
       - working-directory: plugins/samples/cpp-compact-sidebar
         run: g++ -std=c++17 -Wall -Wextra -Werror main.cpp -o cpp-compact-sidebar
