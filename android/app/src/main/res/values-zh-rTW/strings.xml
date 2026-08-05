@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Discord Extensions</string>
+    <string name="android_subtitle">Android 擴充宿主與模組工作台</string>
+    <string name="import_plugin">匯入插件</string>
+    <string name="open_workbench">模組工作台</string>
+    <string name="open_discord_web">開啟 Discord 網頁版</string>
+    <string name="refresh">重新整理</string>
+    <string name="debug_log">除錯日誌</string>
+    <string name="installed_plugins">已安裝插件</string>
+    <string name="no_plugins">尚未安裝插件。</string>
+    <string name="enabled">啟用</string>
+    <string name="disabled">停用</string>
+    <string name="import_complete">插件匯入完成。</string>
+    <string name="import_failed">插件匯入失敗：%1$s</string>
+    <string name="workbench_title">擴充功能模組工作台</string>
+    <string name="module_id">模組 ID</string>
+    <string name="module_name">模組名稱</string>
+    <string name="author">作者</string>
+    <string name="description">說明</string>
+    <string name="language">語言</string>
+    <string name="create_module">建立模組</string>
+    <string name="export_module">匯出模組 ZIP</string>
+    <string name="module_created">模組已建立於應用程式私有 mods 儲存空間。</string>
+    <string name="module_exported">模組套件已匯出。</string>
+    <string name="invalid_module">請輸入有效的模組 ID 與名稱。</string>
+    <string name="back">返回</string>
+</resources>
