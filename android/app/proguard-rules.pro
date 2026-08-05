@@ -1,0 +1,2 @@
+-keep class io.yanagikh.discordextensions.model.** { *; }
+-dontwarn org.json.**
