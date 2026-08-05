@@ -6,7 +6,6 @@ import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
 import java.nio.charset.StandardCharsets
-import java.nio.file.Files
 import java.util.zip.ZipInputStream
 
 data class PluginSummary(
@@ -93,7 +92,7 @@ class PluginRepository(private val context: Context) {
             val targetRoot = File(pluginsRoot, validation.pluginId)
             targetRoot.deleteRecursively()
             sourceRoot.copyRecursively(targetRoot, overwrite = true)
-            Files.writeString(File(targetRoot, "plugin.json").toPath(), validation.manifest.toString(2), StandardCharsets.UTF_8)
+            File(targetRoot, "plugin.json").writeText(validation.manifest.toString(2), StandardCharsets.UTF_8)
             DebugLogStore.append(context, "Imported plugin ${validation.pluginId}")
 
             return listPlugins().first { it.id == validation.pluginId }
