@@ -24,48 +24,30 @@
             android:text="@string/android_subtitle"
             android:textSize="15sp" />
 
-        <LinearLayout
+        <Button
+            android:id="@+id/importButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:orientation="horizontal">
+            android:text="@string/import_plugin" />
 
-            <Button
-                android:id="@+id/importButton"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/import_plugin" />
-
-            <Button
-                android:id="@+id/workbenchButton"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:text="@string/open_workbench" />
-        </LinearLayout>
-
-        <LinearLayout
+        <Button
+            android:id="@+id/workbenchButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:text="@string/open_workbench" />
 
-            <Button
-                android:id="@+id/discordWebButton"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/open_discord_web" />
+        <Button
+            android:id="@+id/discordWebButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/open_discord_web" />
 
-            <Button
-                android:id="@+id/refreshButton"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:text="@string/refresh" />
-        </LinearLayout>
+        <Button
+            android:id="@+id/refreshButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/refresh" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -95,8 +77,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:background="#0B0E14"
             android:fontFamily="monospace"
+            android:minHeight="120dp"
             android:padding="12dp"
+            android:textColor="#C9D1D9"
             android:textIsSelectable="true"
             android:textSize="12sp" />
     </LinearLayout>
