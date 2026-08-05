@@ -122,14 +122,14 @@ class WorkbenchActivity : AppCompatActivity() {
 
 public final class ExtensionModule {
     public String execute(String input) {
-        return \"{\\\"plugin\\\":\\\"$id\\\",\\\"status\\\":\\\"ok\\\"}\";
+        return "{\"plugin\":\"$id\",\"status\":\"ok\"}";
     }
 }
 """
         "kotlin" -> """package module
 
 class ExtensionModule {
-    fun execute(input: String): String = \"{\\\"plugin\\\":\\\"$id\\\",\\\"status\\\":\\\"ok\\\"}\"
+    fun execute(input: String): String = "{\"plugin\":\"$id\",\"status\":\"ok\"}"
 }
 """
         "typescript" -> """export function execute(input: unknown) {
