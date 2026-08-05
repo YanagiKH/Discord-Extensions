@@ -13,12 +13,19 @@ export function getPluginsRoot(): string {
   return path.join(getWorkspaceRoot(), 'plugins');
 }
 
+export function getModsRoot(): string {
+  return path.join(getWorkspaceRoot(), 'mods');
+}
+
 export function getStateFilePath(): string {
   return path.join(getWorkspaceRoot(), 'state.json');
 }
 
 export async function ensureWorkspace(): Promise<void> {
-  await fs.mkdir(getPluginsRoot(), { recursive: true });
+  await Promise.all([
+    fs.mkdir(getPluginsRoot(), { recursive: true }),
+    fs.mkdir(getModsRoot(), { recursive: true })
+  ]);
 }
 
 export async function readPluginStore(): Promise<Record<string, PluginStoreRecord>> {
@@ -38,6 +45,13 @@ export async function writePluginStore(store: Record<string, PluginStoreRecord>)
 
 export async function openWorkspaceFolder(): Promise<string> {
   const folder = getWorkspaceRoot();
+  await shell.openPath(folder);
+  return folder;
+}
+
+export async function openModsFolder(): Promise<string> {
+  const folder = getModsRoot();
+  await fs.mkdir(folder, { recursive: true });
   await shell.openPath(folder);
   return folder;
 }
