@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Discord Extensions Module Workbench</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./workbench.css" />
+  </head>
+  <body>
+    <main class="workbench-shell">
+      <header>
+        <h1>Extension Module Workbench</h1>
+        <p>Create JavaScript, TypeScript, Java, and Kotlin module packages under the local <code>mods/</code> workspace.</p>
+      </header>
+
+      <section class="panel workbench-form">
+        <label><span>Module ID</span><input id="moduleId" type="text" placeholder="my-extension" /></label>
+        <label><span>Module name</span><input id="moduleName" type="text" placeholder="My Extension" /></label>
+        <label><span>Author</span><input id="moduleAuthor" type="text" value="YanagiKH" /></label>
+        <label><span>Description</span><textarea id="moduleDescription" rows="4" placeholder="Describe what the module does."></textarea></label>
+        <label><span>Category</span>
+          <select id="moduleCategory">
+            <option value="utility">Utility</option>
+            <option value="audio">Audio</option>
+            <option value="ui">UI</option>
+            <option value="automation">Automation</option>
+            <option value="integration">Integration</option>
+          </select>
+        </label>
+        <label><span>Language</span><select id="moduleLanguage"></select></label>
+
+        <div id="templateDescription" class="workbench-note"></div>
+        <div class="workbench-actions">
+          <button id="createModule" class="primary" type="button">Create module</button>
+          <button id="exportModule" class="secondary" type="button" disabled>Export ZIP</button>
+          <button id="openMods" class="secondary" type="button">Open mods folder</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Generated output</h2>
+        <pre id="workbenchOutput">No module has been created yet.</pre>
+      </section>
+    </main>
+    <script type="module" src="./workbench.ts"></script>
+  </body>
+</html>
