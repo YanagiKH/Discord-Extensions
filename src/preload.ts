@@ -2,7 +2,12 @@ import { contextBridge, ipcRenderer } from 'electron';
 import type { AppSettings } from './shared/app-settings';
 import { IPC_CHANNELS } from './shared/ipc';
 import type { DiscordExtensionsApi } from './shared/ipc';
-import type { InstalledPlugin, PluginImportResult } from './shared/types';
+import type {
+  CreateWorkbenchModuleRequest,
+  PluginImportResult,
+  WorkbenchModuleResult,
+  WorkbenchTemplate
+} from './shared/types';
 
 function onChannel<T>(channel: string, callback: (payload: T) => void): () => void {
   const listener = (_event: Electron.IpcRendererEvent, payload: T) => callback(payload);
@@ -24,6 +29,14 @@ const api: DiscordExtensionsApi = {
   getAppSettings: (): Promise<AppSettings> => ipcRenderer.invoke(IPC_CHANNELS.getAppSettings),
   updateAppSettings: (settings: Partial<AppSettings>) =>
     ipcRenderer.invoke(IPC_CHANNELS.updateAppSettings, settings),
+  openWorkbench: (): Promise<boolean> => ipcRenderer.invoke(IPC_CHANNELS.openWorkbench),
+  listWorkbenchTemplates: (): Promise<WorkbenchTemplate[]> =>
+    ipcRenderer.invoke(IPC_CHANNELS.listWorkbenchTemplates),
+  createWorkbenchModule: (request: CreateWorkbenchModuleRequest): Promise<WorkbenchModuleResult> =>
+    ipcRenderer.invoke(IPC_CHANNELS.createWorkbenchModule, request),
+  exportWorkbenchModule: (moduleId: string): Promise<string | null> =>
+    ipcRenderer.invoke(IPC_CHANNELS.exportWorkbenchModule, moduleId),
+  openModsFolder: (): Promise<string> => ipcRenderer.invoke(IPC_CHANNELS.openModsFolder),
   onPluginsRefreshed: (callback: () => void) => onChannel<void>(IPC_CHANNELS.pluginsRefreshed, callback),
   onAppSettingsUpdated: (callback: (settings: AppSettings) => void) =>
     onChannel<AppSettings>(IPC_CHANNELS.appSettingsUpdated, callback)
