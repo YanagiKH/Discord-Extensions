@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Discord Extensions</title>
     <link rel="stylesheet" href="./styles.css" />
+    <style>
+      .localized-workbench-label { display: none; }
+      html[lang="en"] .localized-workbench-label[data-locale="en"],
+      html[lang="zh-TW"] .localized-workbench-label[data-locale="zh-TW"],
+      html[lang="ja"] .localized-workbench-label[data-locale="ja"] { display: inline; }
+    </style>
   </head>
   <body>
     <div id="app">
@@ -18,7 +24,11 @@
             <span id="languageLabel">Language</span>
             <select id="languageSelect"></select>
           </label>
-          <button id="workbenchBtn" class="primary" type="button" onclick="window.discordExtensions.openWorkbench()">Module workbench</button>
+          <button id="workbenchBtn" class="primary" type="button" onclick="window.discordExtensions.openWorkbench()">
+            <span class="localized-workbench-label" data-locale="en">Module workbench</span>
+            <span class="localized-workbench-label" data-locale="zh-TW">模組工作台</span>
+            <span class="localized-workbench-label" data-locale="ja">モジュールワークベンチ</span>
+          </button>
           <button id="importBtn" class="primary">Import plugins</button>
           <button id="refreshBtn" class="secondary">Refresh</button>
           <button id="dataBtn" class="secondary">Open data folder</button>
