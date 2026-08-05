@@ -26,8 +26,10 @@ function sharedWebPreferences() {
 
 function loadRendererPage(window: BrowserWindow, page: string) {
   if (process.env.VITE_DEV_SERVER_URL) {
-    const suffix = page === 'index.html' ? '' : page;
-    void window.loadURL(`${process.env.VITE_DEV_SERVER_URL}${suffix}`);
+    const base = process.env.VITE_DEV_SERVER_URL.endsWith('/')
+      ? process.env.VITE_DEV_SERVER_URL
+      : `${process.env.VITE_DEV_SERVER_URL}/`;
+    void window.loadURL(page === 'index.html' ? base : `${base}${page}`);
   } else {
     void window.loadFile(path.join(__dirname, `../renderer/${page}`));
   }
@@ -171,11 +173,15 @@ function registerIpc() {
     }
   );
   ipcMain.handle(IPC_CHANNELS.exportWorkbenchModule, async (_event: IpcMainInvokeEvent, moduleId: string) => {
-    const result = await dialog.showSaveDialog(workbenchWindow ?? mainWindow ?? undefined, {
+    const options = {
       title: 'Export extension module',
       defaultPath: `${moduleId}.zip`,
       filters: [{ name: 'ZIP package', extensions: ['zip'] }]
-    });
+    };
+    const parent = workbenchWindow ?? mainWindow;
+    const result = parent
+      ? await dialog.showSaveDialog(parent, options)
+      : await dialog.showSaveDialog(options);
     if (result.canceled || !result.filePath) {
       return null;
     }
