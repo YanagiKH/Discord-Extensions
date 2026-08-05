@@ -8,7 +8,7 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 public final class PluginManifestValidator {
-    private static final Pattern ID_PATTERN = Pattern.compile("^[a-z0-9][a-z0-9._-]{1,63}$");
+    private static final Pattern ID_PATTERN = Pattern.compile("^[a-z0-9][a-z0-9._-]{0,63}$");
 
     private PluginManifestValidator() {}
 
